@@ -247,9 +247,9 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      */
     public toString(): string {
         let unformattedBoard = "";
-        for (let y = 0; y < this.boardHeight; y++) {
-            for (let x = 0; x < this.boardWidth; x++) {
-                const move = { x, y } as Position<Range<Width>, Range<Height>>;
+        for (let y = 0 as Range<Height>; y < this.boardHeight; y++) {
+            for (let x = 0 as Range<Width>; x < this.boardWidth; x++) {
+                const move = { x, y };
                 unformattedBoard += `${(this.cellOccupier(move) ?? -1) + 1}${x < this.boardWidth - 1 ? " " : "\n"}`;
             }
         }
