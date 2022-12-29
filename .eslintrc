@@ -1,0 +1,10 @@
+{
+    "extends": "@oathompsonjones/eslint-config/TypeScript/Node",
+    "ignorePatterns": [
+        "Ignore",
+        "**/*.js"
+    ],
+    "parserOptions": {
+        "project": "./tsconfig.json"
+    }
+}

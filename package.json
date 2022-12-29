@@ -1,0 +1,24 @@
+{
+    "dependencies": {
+        "@oathompsonjones/eslint-config": "^0.0.34",
+        "@oathompsonjones/ts-config": "^0.0.6",
+        "@types/node": "^18.11.17"
+    },
+    "name": "minigames",
+    "description": "This repository contains a selection of MiniGames. You can play these games on [my website](https://oathompsonjones.co.uk/arcade).",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/oathompsonjones/MiniGames.git"
+    },
+    "author": "oathompsonjones",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/oathompsonjones/MiniGames/issues"
+    },
+    "homepage": "https://oathompsonjones.co.uk/arcade"
+}
