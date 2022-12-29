@@ -1,8 +1,7 @@
 import type { Minimax, Player, Position, Range } from "../Types";
-import type { MoveDimensions, PlayerType } from "../Utils";
+import { PlayerType, RenderType } from "../Utils";
 import type { BitBoard } from "../BitBoard";
 import type { Board } from "./";
-import { RenderType } from "../Utils/Constants";
 
 /**
  * Represents a game controller.
@@ -13,22 +12,16 @@ import { RenderType } from "../Utils/Constants";
  * @template BoardWidth extends number
  * @template BoardHeight extends number
  * @template BoardType extends BitBoard
- * @template MoveType extends MoveDimensions = MoveDimensions.TwoDimensional
  */
-export abstract class Controller<
-    BoardWidth extends number,
-    BoardHeight extends number,
-    BoardType extends BitBoard,
-    MoveType extends MoveDimensions = MoveDimensions.TwoDimensional
-> {
+export abstract class Controller<BoardWidth extends number, BoardHeight extends number, BoardType extends BitBoard> {
     /**
      * Contains the board.
      *
      * @protected
      * @readonly
-     * @type {Board<BoardWidth, BoardHeight, BoardType, MoveType>}
+     * @type {Board<BoardWidth, BoardHeight, BoardType>}
      */
-    protected readonly board: Board<BoardWidth, BoardHeight, BoardType, MoveType>;
+    protected readonly board: Board<BoardWidth, BoardHeight, BoardType>;
 
     /**
      * Contains the player objects.
@@ -61,11 +54,11 @@ export abstract class Controller<
      *
      * @constructor
      * @protected
-     * @param {Board<BoardWidth, BoardHeight, BoardType, MoveType>} board The board.
+     * @param {Board<BoardWidth, BoardHeight, BoardType>} board The board.
      * @param {PlayerType[]} playerTypes The types of player.
      * @param {RenderType} renderType The rendering type.
      */
-    protected constructor(board: Board<BoardWidth, BoardHeight, BoardType, MoveType>, playerTypes: PlayerType[], renderType: RenderType) {
+    protected constructor(board: Board<BoardWidth, BoardHeight, BoardType>, playerTypes: PlayerType[], renderType: RenderType) {
         this.board = board;
         this.players = playerTypes.map((playerType, id) => ({ id, playerType }));
         this.renderType = renderType;
@@ -83,23 +76,47 @@ export abstract class Controller<
     }
 
     /**
+     * Controls the main game flow.
+     *
+     * @public
+     * @async
+     * @returns {(Promise<number | null>)} The winner.
+     */
+    public async play(): Promise<number | null> {
+        this.render(this.board.winner);
+        while (this.board.winner === false) {
+            let move: Position<Range<BoardWidth>, Range<BoardHeight>>;
+            if (this.currentPlayer.playerType === PlayerType.Human) {
+                // eslint-disable-next-line no-await-in-loop
+                move = await this.getValidMove();
+            } else {
+                move = this.determineCPUMove(this.currentPlayer.playerType);
+            }
+            this.board.makeMove(move, this.currentPlayer.id);
+            this.render(this.board.winner);
+            this.nextTurn();
+        }
+        return this.board.winner;
+    }
+
+    /**
      * The minimax algorithm.
      *
      * @link https://en.wikipedia.org/wiki/Minimax
      * @public
      * @param {number} [depth=Infinity] The depth of the algorithm.
      * @param {boolean} [maximisingPlayer=true] Whether or not the current player is the maximising player.
-     * @returns {Minimax<MoveType, BoardWidth, BoardHeight>} The optimal move.
+     * @returns {Minimax<BoardWidth, BoardHeight>} The optimal move.
      */
-    public minimax(depth: number = Infinity, maximisingPlayer: boolean = true): Minimax<MoveType, BoardWidth, BoardHeight> {
+    public minimax(depth: number = Infinity, maximisingPlayer: boolean = true): Minimax<BoardWidth, BoardHeight> {
         const playerIds = [(this.currentPlayerId + 1) % 2, this.currentPlayerId];
         if (depth === 0 || this.board.winner !== false) {
             return {
-                move:  null as Minimax<MoveType, BoardWidth, BoardHeight>["move"],
+                move:  null as unknown as Minimax<BoardWidth, BoardHeight>["move"],
                 score: this.board.heuristic * (this.currentPlayerId === 1 ? 1 : -1)
             };
         }
-        const scores: Array<Minimax<MoveType, BoardWidth, BoardHeight>> = [];
+        const scores: Array<Minimax<BoardWidth, BoardHeight>> = [];
         const { emptyCells } = this.board;
         for (const move of emptyCells) {
             this.board.makeMove(move, playerIds[Number(maximisingPlayer)]!);
@@ -139,9 +156,9 @@ export abstract class Controller<
      *
      * @public
      * @async
-     * @returns {Promise<Position<MoveType>>} The input.
+     * @returns {Promise<Position>} The input.
      */
-    public async getInput(): Promise<Position<MoveType>> {
+    public async getInput(): Promise<Position> {
         switch (this.renderType) {
             case RenderType.Console:
                 return this.getConsoleInput();
@@ -155,43 +172,34 @@ export abstract class Controller<
      *
      * @public
      * @async
-     * @returns {Promise<Position<MoveType, Range<BoardWidth>, Range<BoardHeight>>>} The valid move.
+     * @returns {Promise<Position<Range<BoardWidth>, Range<BoardHeight>>>} The valid move.
      */
-    public async getValidMove(): Promise<Position<MoveType, Range<BoardWidth>, Range<BoardHeight>>> {
-        let move: Position<MoveType>;
+    public async getValidMove(): Promise<Position<Range<BoardWidth>, Range<BoardHeight>>> {
+        let move: Position;
         do
             // eslint-disable-next-line no-await-in-loop
             move = await this.getInput();
         while (!this.board.moveIsValid(move));
-        return move as Position<MoveType, Range<BoardWidth>, Range<BoardHeight>>;
+        return move as Position<Range<BoardWidth>, Range<BoardHeight>>;
     }
-
-    /**
-     * Controls the main game flow.
-     *
-     * @public
-     * @abstract
-     * @returns {(Promise<number | null>)} The winner.
-     */
-    public abstract play(): Promise<number | null>;
 
     /**
      * Gets input from the console.
      *
      * @public
      * @abstract
-     * @returns {Promise<Position<MoveType>>} The input.
+     * @returns {Promise<Position>} The input.
      */
-    public abstract getConsoleInput(): Promise<Position<MoveType>>;
+    public abstract getConsoleInput(): Promise<Position>;
 
     /**
      * Gets input from the canvas.
      *
      * @public
      * @abstract
-     * @returns {Promise<Position<MoveType>>} The input.
+     * @returns {Promise<Position>} The input.
      */
-    public abstract getCanvasInput(): Promise<Position<MoveType>>;
+    public abstract getCanvasInput(): Promise<Position>;
 
     /**
      * Renders to the console.
@@ -217,16 +225,16 @@ export abstract class Controller<
      * @public
      * @abstract
      * @param {Omit<PlayerType, PlayerType.Human>} difficulty The difficulty of the AI.
-     * @returns {Position<MoveType, Range<BoardWidth>, Range<BoardHeight>>} The move.
+     * @returns {Position<Range<BoardWidth>, Range<BoardHeight>>} The move.
      */
-    public abstract determineCPUMove(difficulty: Omit<PlayerType, PlayerType.Human>): Position<MoveType, Range<BoardWidth>, Range<BoardHeight>>;
+    public abstract determineCPUMove(difficulty: Omit<PlayerType, PlayerType.Human>): Position<Range<BoardWidth>, Range<BoardHeight>>;
 
     /**
      * Finds the optimal move.
      *
      * @public
      * @abstract
-     * @returns {(Position<MoveType, Range<BoardWidth>, Range<BoardHeight>> | null)} The optimal move.
+     * @returns {(Position<Range<BoardWidth>, Range<BoardHeight>> | null)} The optimal move.
      */
-    public abstract findOptimalMove(): Position<MoveType, Range<BoardWidth>, Range<BoardHeight>> | null;
+    public abstract findOptimalMove(): Position<Range<BoardWidth>, Range<BoardHeight>> | null;
 }
