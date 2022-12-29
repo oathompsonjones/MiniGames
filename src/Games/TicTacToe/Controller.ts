@@ -46,7 +46,7 @@ export class Controller extends Base<3, 3, IntBitBoard> {
         }
     }
 
-    public async getConsoleInput(): Promise<Position> {
+    public async getConsoleInput(): Promise<Position<MoveDimensions.TwoDimensional, Range<3>, Range<3>>> {
         let input: string;
         let testedInput: RegExpExecArray | null = null;
         do {
@@ -54,14 +54,17 @@ export class Controller extends Base<3, 3, IntBitBoard> {
             input = await Console.readLine(`Player ${this.currentPlayer.id + 1}'s move (XY): `);
             testedInput = (/^([A-Ca-c])([1-3])$/u).exec(input);
         } while (testedInput === null);
-        return { x: testedInput[1]!.toUpperCase().charCodeAt(0) - 65, y: Number(testedInput[2]) - 1 };
+        return {
+            x: testedInput[1]!.toUpperCase().charCodeAt(0) - 65,
+            y: Number(testedInput[2]) - 1
+        } as Position<MoveDimensions.TwoDimensional, Range<3>, Range<3>>;
     }
 
-    public async getCanvasInput(): Promise<Position> {
+    public async getCanvasInput(): Promise<Position<MoveDimensions.TwoDimensional, Range<3>, Range<3>>> {
         void await new Promise((): void => {
             void this;
         });
-        return { x: -1, y: -1 };
+        return { x: 1, y: 1 } as Position<MoveDimensions.TwoDimensional, Range<3>, Range<3>>;
         // TODO
     }
 
