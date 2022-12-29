@@ -141,9 +141,9 @@ export abstract class BitBoard<DataType extends LongInt | number = LongInt | num
      * @public
      * @abstract
      * @param {(BitBoard<DataType> | number)} right The right value.
-     * @returns {BitBoard<DataType>} The result.
+     * @returns {this} The result.
      */
-    public abstract and(right: BitBoard<DataType> | DataType | number): BitBoard<DataType>;
+    public abstract and(right: BitBoard<DataType> | DataType | number): this;
 
     /**
      * Carries out a bitwise or (|) operation.
@@ -151,9 +151,9 @@ export abstract class BitBoard<DataType extends LongInt | number = LongInt | num
      * @public
      * @abstract
      * @param {(BitBoard<DataType> | number)} right The right value.
-     * @returns {BitBoard<DataType>} The result.
+     * @returns {this} The result.
      */
-    public abstract or(right: BitBoard<DataType> | DataType | number): BitBoard<DataType>;
+    public abstract or(right: BitBoard<DataType> | DataType | number): this;
 
     /**
      * Carries out a bitwise xor (^) operation.
@@ -161,18 +161,18 @@ export abstract class BitBoard<DataType extends LongInt | number = LongInt | num
      * @public
      * @abstract
      * @param {(BitBoard<DataType> | number)} right The right value.
-     * @returns {BitBoard<DataType>} The result.
+     * @returns {this} The result.
      */
-    public abstract xor(right: BitBoard<DataType> | DataType | number): BitBoard<DataType>;
+    public abstract xor(right: BitBoard<DataType> | DataType | number): this;
 
     /**
      * Carries out a bitwise not (~) operation.
      *
      * @public
      * @abstract
-     * @returns {BitBoard<DataType>} The result.
+     * @returns {this} The result.
      */
-    public abstract not(): BitBoard<DataType>;
+    public abstract not(): this;
 
     /**
      * Carries out a bitwise left shift (<<) operation.
@@ -180,9 +180,9 @@ export abstract class BitBoard<DataType extends LongInt | number = LongInt | num
      * @public
      * @abstract
      * @param {number} shiftAmount How much to shift it by.
-     * @returns {BitBoard<DataType>} The result.
+     * @returns {this} The result.
      */
-    public abstract leftShift(shiftAmount: number): BitBoard<DataType>;
+    public abstract leftShift(shiftAmount: number): this;
 
     /**
      * Carries out a bitwise logical right shift (>>>) operation.
@@ -190,9 +190,9 @@ export abstract class BitBoard<DataType extends LongInt | number = LongInt | num
      * @public
      * @abstract
      * @param {number} shiftAmount How much to shift it by.
-     * @returns {BitBoard<DataType>} The result.
+     * @returns {this} The result.
      */
-    public abstract rightShift(shiftAmount: number): BitBoard<DataType>;
+    public abstract rightShift(shiftAmount: number): this;
 
     /**
      * Carries out a bitwise arithmetic right shift (>>) operation.
@@ -200,9 +200,9 @@ export abstract class BitBoard<DataType extends LongInt | number = LongInt | num
      * @public
      * @abstract
      * @param {number} shiftAmount How much to shift it by.
-     * @returns {BitBoard<DataType>} The result.
+     * @returns {this} The result.
      */
-    public abstract arithmeticRightShift(shiftAmount: number): BitBoard<DataType>;
+    public abstract arithmeticRightShift(shiftAmount: number): this;
 
     /**
      * Checks if two BitBoards have equal data values.

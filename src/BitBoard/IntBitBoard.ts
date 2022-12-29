@@ -52,32 +52,32 @@ export class IntBitBoard extends BitBoard<number> {
         return bits;
     }
 
-    public and(right: IntBitBoard | number): IntBitBoard {
-        return new IntBitBoard(this._data & (right instanceof IntBitBoard ? right.data : right));
+    public and(right: IntBitBoard | number): this {
+        return new IntBitBoard(this._data & (right instanceof IntBitBoard ? right.data : right)) as this;
     }
 
-    public or(right: IntBitBoard | number): IntBitBoard {
-        return new IntBitBoard(this._data | (right instanceof IntBitBoard ? right.data : right));
+    public or(right: IntBitBoard | number): this {
+        return new IntBitBoard(this._data | (right instanceof IntBitBoard ? right.data : right)) as this;
     }
 
-    public xor(right: IntBitBoard | number): IntBitBoard {
-        return new IntBitBoard(this._data ^ (right instanceof IntBitBoard ? right.data : right));
+    public xor(right: IntBitBoard | number): this {
+        return new IntBitBoard(this._data ^ (right instanceof IntBitBoard ? right.data : right)) as this;
     }
 
-    public not(): IntBitBoard {
-        return new IntBitBoard(~this._data);
+    public not(): this {
+        return new IntBitBoard(~this._data) as this;
     }
 
-    public leftShift(shiftAmount: number): IntBitBoard {
-        return new IntBitBoard(this._data << shiftAmount);
+    public leftShift(shiftAmount: number): this {
+        return new IntBitBoard(this._data << shiftAmount) as this;
     }
 
-    public rightShift(shiftAmount: number): IntBitBoard {
-        return new IntBitBoard(this._data >>> shiftAmount);
+    public rightShift(shiftAmount: number): this {
+        return new IntBitBoard(this._data >>> shiftAmount) as this;
     }
 
-    public arithmeticRightShift(shiftAmount: number): IntBitBoard {
-        return new IntBitBoard(this._data >> shiftAmount);
+    public arithmeticRightShift(shiftAmount: number): this {
+        return new IntBitBoard(this._data >> shiftAmount) as this;
     }
 
     public equals(value: IntBitBoard | number): boolean {

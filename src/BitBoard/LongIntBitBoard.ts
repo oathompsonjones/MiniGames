@@ -78,32 +78,32 @@ export class LongIntBitBoard extends BitBoard<LongInt> {
         return bits;
     }
 
-    public and(right: LongIntBitBoard | number): LongIntBitBoard {
-        return new LongIntBitBoard(LongInt.and(this._data, right instanceof LongIntBitBoard ? right.data : right));
+    public and(right: LongIntBitBoard | number): this {
+        return new LongIntBitBoard(LongInt.and(this._data, right instanceof LongIntBitBoard ? right.data : right)) as this;
     }
 
-    public or(right: LongIntBitBoard | number): LongIntBitBoard {
-        return new LongIntBitBoard(LongInt.or(this._data, right instanceof LongIntBitBoard ? right.data : right));
+    public or(right: LongIntBitBoard | number): this {
+        return new LongIntBitBoard(LongInt.or(this._data, right instanceof LongIntBitBoard ? right.data : right)) as this;
     }
 
-    public xor(right: LongIntBitBoard | number): LongIntBitBoard {
-        return new LongIntBitBoard(LongInt.xor(this._data, right instanceof LongIntBitBoard ? right.data : right));
+    public xor(right: LongIntBitBoard | number): this {
+        return new LongIntBitBoard(LongInt.xor(this._data, right instanceof LongIntBitBoard ? right.data : right)) as this;
     }
 
-    public not(): LongIntBitBoard {
-        return new LongIntBitBoard(LongInt.not(this._data));
+    public not(): this {
+        return new LongIntBitBoard(LongInt.not(this._data)) as this;
     }
 
-    public leftShift(shiftAmount: number): LongIntBitBoard {
-        return new LongIntBitBoard(LongInt.leftShift(this._data, shiftAmount));
+    public leftShift(shiftAmount: number): this {
+        return new LongIntBitBoard(LongInt.leftShift(this._data, shiftAmount)) as this;
     }
 
-    public rightShift(shiftAmount: number): LongIntBitBoard {
-        return new LongIntBitBoard(LongInt.rightShift(this._data, shiftAmount));
+    public rightShift(shiftAmount: number): this {
+        return new LongIntBitBoard(LongInt.rightShift(this._data, shiftAmount)) as this;
     }
 
-    public arithmeticRightShift(shiftAmount: number): LongIntBitBoard {
-        return new LongIntBitBoard(LongInt.arithmeticRightShift(this._data, shiftAmount));
+    public arithmeticRightShift(shiftAmount: number): this {
+        return new LongIntBitBoard(LongInt.arithmeticRightShift(this._data, shiftAmount)) as this;
     }
 
     public equals(value: LongInt | LongIntBitBoard | number): boolean {
