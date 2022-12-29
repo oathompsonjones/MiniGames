@@ -36,7 +36,9 @@ export default class Board extends Base<3, 3, IntBitBoard, MoveDimensions.TwoDim
     }
 
     public override toString(): string {
-        return `  A B C\n${super.toString().trim()
+        return `  A B C\n${super
+            .toString()
+            .trim()
             .split("\n")
             .map((line, i) => `${i + 1} ${line
                 .replace(/\s/gu, GridLines.Vertical)
