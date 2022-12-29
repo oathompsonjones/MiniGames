@@ -45,14 +45,6 @@ export class Controller extends Base<3, 3, IntBitBoard> {
         }
     }
 
-    public async getCanvasInput(): Promise<Position> {
-        void await new Promise((): void => {
-            void this;
-        });
-        return { x: -1, y: -1 };
-        // TODO
-    }
-
     public async getConsoleInput(): Promise<Position> {
         let input: string;
         let testedInput: RegExpExecArray | null = null;
@@ -64,8 +56,11 @@ export class Controller extends Base<3, 3, IntBitBoard> {
         return { x: testedInput[1]!.toUpperCase().charCodeAt(0) - 65, y: Number(testedInput[2]) - 1 };
     }
 
-    public renderToCanvas(winner: number | false | null): void {
-        void [this, winner];
+    public async getCanvasInput(): Promise<Position> {
+        void await new Promise((): void => {
+            void this;
+        });
+        return { x: -1, y: -1 };
         // TODO
     }
 
@@ -74,6 +69,11 @@ export class Controller extends Base<3, 3, IntBitBoard> {
         Console.writeLine(this.board.toString());
         if (winner !== false)
             Console.writeLine(winner === null ? "It's a tie!" : `Player ${winner + 1} wins!`);
+    }
+
+    public renderToCanvas(winner: number | false | null): void {
+        void [this, winner];
+        // TODO
     }
 
     public findOptimalMove(): Position<MoveDimensions.TwoDimensional, Range<3>, Range<3>> | null {

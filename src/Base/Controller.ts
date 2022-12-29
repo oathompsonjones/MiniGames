@@ -126,10 +126,10 @@ export abstract class Controller<
      */
     public render(winner: number | false | null): void {
         switch (this.renderType) {
-            case RenderType.Canvas:
-                return this.renderToCanvas(winner);
             case RenderType.Console:
                 return this.renderToConsole(winner);
+            case RenderType.Canvas:
+                return this.renderToCanvas(winner);
         }
     }
 
@@ -142,10 +142,10 @@ export abstract class Controller<
      */
     public async getInput(): Promise<Position<MoveType>> {
         switch (this.renderType) {
-            case RenderType.Canvas:
-                return this.getCanvasInput();
             case RenderType.Console:
                 return this.getConsoleInput();
+            case RenderType.Canvas:
+                return this.getCanvasInput();
         }
     }
 
@@ -175,15 +175,6 @@ export abstract class Controller<
     public abstract play(): Promise<number | null>;
 
     /**
-     * Gets input form the canvas.
-     *
-     * @public
-     * @abstract
-     * @returns {Promise<Position<MoveType>>} The input.
-     */
-    public abstract getCanvasInput(): Promise<Position<MoveType>>;
-
-    /**
      * Gets input from the console.
      *
      * @public
@@ -193,13 +184,13 @@ export abstract class Controller<
     public abstract getConsoleInput(): Promise<Position<MoveType>>;
 
     /**
-     * Renders to the canvas.
+     * Gets input from the canvas.
      *
      * @public
      * @abstract
-     * @param {(number | false | null)} winner The output of get winner.
+     * @returns {Promise<Position<MoveType>>} The input.
      */
-    public abstract renderToCanvas(winner: number | false | null): void;
+    public abstract getCanvasInput(): Promise<Position<MoveType>>;
 
     /**
      * Renders to the console.
@@ -209,6 +200,15 @@ export abstract class Controller<
      * @param {(number | false | null)} winner The output of get winner.
      */
     public abstract renderToConsole(winner: number | false | null): void;
+
+    /**
+     * Renders to the canvas.
+     *
+     * @public
+     * @abstract
+     * @param {(number | false | null)} winner The output of get winner.
+     */
+    public abstract renderToCanvas(winner: number | false | null): void;
 
     /**
      * Determines the CPU move.
