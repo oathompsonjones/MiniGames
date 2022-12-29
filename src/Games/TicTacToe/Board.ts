@@ -16,7 +16,7 @@ export default class Board extends Base<3, 3, IntBitBoard, MoveDimensions.TwoDim
     ];
 
     public constructor() {
-        super(3, 3, 2);
+        super(3, 3);
     }
 
     public get heuristic(): number {
