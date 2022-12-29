@@ -1,4 +1,4 @@
-import type { MoveDimensions, PlayerType } from "./Utils";
+import type { PlayerType } from "./Utils";
 
 // Player
 interface Player<Type extends PlayerType> {
@@ -7,20 +7,16 @@ interface Player<Type extends PlayerType> {
 }
 
 // Minimax
-interface Minimax<MoveType extends MoveDimensions, BoardWidth extends number, BoardHeight extends number> {
-    move: Position<MoveType, Range<BoardWidth>, Range<BoardHeight>>; score: number;
+interface Minimax<BoardWidth extends number, BoardHeight extends number> {
+    move: Position<Range<BoardWidth>, Range<BoardHeight>>;
+    score: number;
 }
 
 // Coordinate system
-type Position<
-    Dimensions extends MoveDimensions = MoveDimensions.TwoDimensional,
-    XRange extends number = number,
-    YRange extends number = number
-> = [
-    never,
-    XRange,
-    { x: XRange; y: YRange; }
-][Dimensions];
+interface Position<XRange extends number = number, YRange extends number = number> {
+    x: XRange;
+    y: YRange;
+}
 
 // Ranges
 type CreateArrayWithLengthX<Length extends number, Acc extends unknown[] = []> = Acc["length"] extends Length ? Acc : CreateArrayWithLengthX<Length, [...Acc, 1]>;

@@ -1,16 +1,4 @@
 /**
- * Defines the orientation of a line.
- *
- * @enum {number}
- */
-export const enum Orientation {
-    Horizontal = "horizontal",
-    Vertical = "vertical",
-    LeadingDiagonal = "leadingDiagonal",
-    NonLeadingDiagonal = "nonLeadingDiagonal"
-}
-
-/**
  * Defines the characters used to draw a grid.
  *
  * @enum {number}
@@ -27,22 +15,6 @@ export const enum GridLines {
     TTop = "\u252C",
     TBottom = "\u2534",
     Cross = "\u253C"
-}
-
-/**
- * Defines how many dimensions each move has.
- *
- * - OneDimensional - row or column
- *
- * - TwoDimensional - 2D cartesian coordinates
- *
- * - ThreeDimensional - 3D cartesian coordinates
- *
- * @enum {number}
- */
-export enum MoveDimensions {
-    OneDimensional = 1,
-    TwoDimensional = 2
 }
 
 /**
