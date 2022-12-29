@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import { PlayerType, RenderType } from "./Utils/Constants";
+import { PlayerType, RenderType } from "./Utils";
 import { TicTacToe } from "./Games";
 import process from "process";
 import readline from "readline/promises";

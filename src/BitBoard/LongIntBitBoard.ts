@@ -1,5 +1,4 @@
-import { BitBoard } from "./BitBoard";
-import { LongInt } from "./LongInt";
+import { BitBoard, LongInt } from "./";
 
 /**
  * A BitBoard which uses an array of 32-bit numbers.

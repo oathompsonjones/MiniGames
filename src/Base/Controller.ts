@@ -1,7 +1,6 @@
-import type { Minimax, Player, Position, Range } from "../Utils/Types";
-import type { MoveDimensions, PlayerType } from "../Utils/Constants";
-import type { BitBoard } from "../BitBoard/BitBoard";
-import type { Board } from "./Board";
+import type { Minimax, MoveDimensions, Player, PlayerType, Position, Range } from "../Utils";
+import type { BitBoard } from "../BitBoard";
+import type { Board } from "./";
 import { RenderType } from "../Utils/Constants";
 
 export abstract class Controller<

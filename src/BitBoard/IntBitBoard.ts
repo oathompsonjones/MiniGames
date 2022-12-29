@@ -1,4 +1,4 @@
-import { BitBoard } from "./BitBoard";
+import { BitBoard } from "./";
 
 /**
  * A BitBoard which uses just one 32-bit number.

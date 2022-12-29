@@ -1,8 +1,6 @@
-import { IntBitBoard, LongIntBitBoard } from "../BitBoard";
-import type { Position, Range } from "../Utils/Types";
-import type { BitBoard } from "../BitBoard/BitBoard";
-import { LongInt } from "../BitBoard/LongInt";
-import type { MoveDimensions } from "../Utils/Constants";
+import { IntBitBoard, LongInt, LongIntBitBoard } from "../BitBoard";
+import type { MoveDimensions, Position, Range } from "../Utils";
+import type { BitBoard } from "../BitBoard";
 
 export abstract class Board<
     Width extends number,

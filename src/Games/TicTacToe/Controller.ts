@@ -1,10 +1,9 @@
-import * as Console from "../../Utils/Console";
-import type { MoveDimensions, RenderType } from "../../Utils/Constants";
-import type { Position, Range } from "../../Utils/Types";
+import * as Console from "../../Utils";
+import type { MoveDimensions, Position, Range, RenderType } from "../../Utils";
 import { Controller as Base } from "../../Base";
 import Board from "./Board";
-import type { IntBitBoard } from "../../BitBoard/IntBitBoard";
-import { PlayerType } from "../../Utils/Constants";
+import type { IntBitBoard } from "../../BitBoard";
+import { PlayerType } from "../../Utils";
 
 export class Controller extends Base<3, 3, IntBitBoard> {
     public constructor(renderType: RenderType, playerOneType: PlayerType, playerTwoType: PlayerType) {

@@ -1,5 +1,5 @@
-import type { LongInt } from "./LongInt";
-import { StringType } from "../Utils/Constants";
+import type { LongInt } from "./";
+import { StringType } from "../Utils";
 
 /**
  * A BitBoard.

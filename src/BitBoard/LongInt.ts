@@ -1,4 +1,4 @@
-import { StringType } from "../Utils/Constants";
+import { StringType } from "../Utils";
 
 /**
  * Represents a long integer using an array of 32-bit numbers.
