@@ -116,7 +116,7 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
             arr[arr.length - 1] = 2 ** (this.boardWidth * this.boardHeight - (arr.length - 1) * 32) - 1;
             return isFull.equals(new LongInt(arr));
         }
-        return isFull.equals(2 ** this.boardWidth * this.boardHeight - 1);
+        return isFull.equals(2 ** (this.boardWidth * this.boardHeight) - 1);
     }
 
     /**
