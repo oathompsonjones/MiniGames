@@ -1,10 +1,8 @@
-import type { Position, Range } from "../../Types";
 import { Board as Base } from "../../Base";
 import { GridLines } from "../../Utils";
 import { IntBitBoard } from "../../BitBoard";
-import type { MoveDimensions } from "../../Utils";
 
-export default class Board extends Base<3, 3, IntBitBoard, MoveDimensions.TwoDimensional> {
+export default class Board extends Base<3, 3, IntBitBoard> {
     protected winningStates: IntBitBoard[] = [
         new IntBitBoard(0b000000111),
         new IntBitBoard(0b000111000),
@@ -29,12 +27,6 @@ export default class Board extends Base<3, 3, IntBitBoard, MoveDimensions.TwoDim
         return 0;
     }
 
-    public moveIsValid(move: Position<MoveDimensions.TwoDimensional, Range<3>, Range<3>>): boolean {
-        const isWithinBoard = move.x >= 0 && move.x <= 2 && move.y >= 0 && move.y <= 2;
-        const notOccupied = this.cellOccupier(move) === null;
-        return isWithinBoard && notOccupied;
-    }
-
     public override toString(): string {
         return `  A B C\n${super
             .toString()
@@ -52,9 +44,5 @@ export default class Board extends Base<3, 3, IntBitBoard, MoveDimensions.TwoDim
                 .join(GridLines.Cross)
                 .padStart(7)}\n`)
             .trim()}`;
-    }
-
-    protected getPlayerBoard(playerId: number): IntBitBoard {
-        return this.data.leftShift(32 - 9 * (playerId + 1)).rightShift(32 - 9);
     }
 }

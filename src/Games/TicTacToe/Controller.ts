@@ -1,34 +1,16 @@
-import * as Console from "../../Utils";
-import type { MoveDimensions, RenderType } from "../../Utils";
+import { Console, PlayerType } from "../../Utils";
 import type { Position, Range } from "../../Types";
 import { Controller as Base } from "../../Base";
 import Board from "./Board";
 import type { IntBitBoard } from "../../BitBoard";
-import { PlayerType } from "../../Utils";
+import type { RenderType } from "../../Utils";
 
 export class Controller extends Base<3, 3, IntBitBoard> {
     public constructor(renderType: RenderType, playerOneType: PlayerType, playerTwoType: PlayerType) {
         super(new Board(), [playerOneType, playerTwoType], renderType);
     }
 
-    public async play(): Promise<number | null> {
-        this.render(this.board.winner);
-        while (this.board.winner === false) {
-            let move: Position<MoveDimensions.TwoDimensional, Range<3>, Range<3>>;
-            if (this.currentPlayer.playerType === PlayerType.Human) {
-                // eslint-disable-next-line no-await-in-loop
-                move = await this.getValidMove();
-            } else {
-                move = this.determineCPUMove(this.currentPlayer.playerType);
-            }
-            this.board.makeMove(move, this.currentPlayer.id);
-            this.render(this.board.winner);
-            this.nextTurn();
-        }
-        return this.board.winner;
-    }
-
-    public determineCPUMove(difficulty: Omit<PlayerType, PlayerType.Human>): Position<MoveDimensions.TwoDimensional, Range<3>, Range<3>> {
+    public determineCPUMove(difficulty: Omit<PlayerType, PlayerType.Human>): Position<Range<3>, Range<3>> {
         const { emptyCells } = this.board;
         const randomMove = emptyCells[Math.floor(Math.random() * emptyCells.length)]!;
         const optimalMove = this.findOptimalMove() ?? randomMove;
@@ -77,7 +59,7 @@ export class Controller extends Base<3, 3, IntBitBoard> {
         // TODO
     }
 
-    public findOptimalMove(): Position<MoveDimensions.TwoDimensional, Range<3>, Range<3>> | null {
+    public findOptimalMove(): Position<Range<3>, Range<3>> | null {
         if (this.board.isEmpty)
             return null;
         const minimax = this.minimax();
