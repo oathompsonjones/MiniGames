@@ -1,4 +1,4 @@
-import type { MoveDimensions, PlayerType } from "./";
+import type { MoveDimensions, PlayerType } from "./Utils";
 
 // Player
 interface Player<Type extends PlayerType> {

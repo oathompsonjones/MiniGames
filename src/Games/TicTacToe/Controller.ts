@@ -1,5 +1,6 @@
 import * as Console from "../../Utils";
-import type { MoveDimensions, Position, Range, RenderType } from "../../Utils";
+import type { MoveDimensions, RenderType } from "../../Utils";
+import type { Position, Range } from "../../Types";
 import { Controller as Base } from "../../Base";
 import Board from "./Board";
 import type { IntBitBoard } from "../../BitBoard";

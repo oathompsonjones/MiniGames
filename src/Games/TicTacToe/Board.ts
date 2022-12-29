@@ -1,7 +1,8 @@
-import type { MoveDimensions, Position, Range } from "../../Utils";
+import type { Position, Range } from "../../Types";
 import { Board as Base } from "../../Base";
 import { GridLines } from "../../Utils";
 import { IntBitBoard } from "../../BitBoard";
+import type { MoveDimensions } from "../../Utils";
 
 export default class Board extends Base<3, 3, IntBitBoard, MoveDimensions.TwoDimensional> {
     protected winningStates: IntBitBoard[] = [

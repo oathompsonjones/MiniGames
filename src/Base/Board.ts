@@ -1,6 +1,7 @@
 import { IntBitBoard, LongInt, LongIntBitBoard } from "../BitBoard";
-import type { MoveDimensions, Position, Range } from "../Utils";
+import type { Position, Range } from "../Types";
 import type { BitBoard } from "../BitBoard";
+import type { MoveDimensions } from "../Utils";
 
 /**
  * Represent a game board.

@@ -1,4 +1,5 @@
-import type { Minimax, MoveDimensions, Player, PlayerType, Position, Range } from "../Utils";
+import type { Minimax, Player, Position, Range } from "../Types";
+import type { MoveDimensions, PlayerType } from "../Utils";
 import type { BitBoard } from "../BitBoard";
 import type { Board } from "./";
 import { RenderType } from "../Utils/Constants";
