@@ -80,7 +80,7 @@ export class Controller extends Base<3, 3, IntBitBoard> {
     public findOptimalMove(): Position<MoveDimensions.TwoDimensional, Range<3>, Range<3>> | null {
         if (this.board.isEmpty)
             return null;
-        const minimax = this.minimax(20);
+        const minimax = this.minimax();
         return minimax.move;
     }
 }
