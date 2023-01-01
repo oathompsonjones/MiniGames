@@ -322,7 +322,7 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      * @returns {BitBoardType} The player's bits.
      */
     protected getPlayerBoard(playerId: number): BitBoardType {
-        const totalBits = (this.data instanceof LongInt ? this.data.data.length : 1) * 32;
+        const totalBits = (this.data instanceof LongIntBitBoard ? this.data.data.data.length : 1) * 32;
         const boardSize = this.boardWidth * this.boardHeight;
         return this.data.leftShift(totalBits - boardSize * (playerId + 1)).rightShift(totalBits - boardSize);
     }
