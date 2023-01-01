@@ -49,7 +49,7 @@ export class Controller extends Base<3, 3, IntBitBoard> {
 
     public renderToConsole(winner: number | false | null): void {
         Console.clear();
-        Console.writeLine(this.board.toString());
+        Console.writeLine(this.board.toString(false));
         if (winner !== false)
             Console.writeLine(winner === null ? "It's a tie!" : `Player ${winner + 1} wins!`);
     }

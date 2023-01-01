@@ -1,5 +1,4 @@
 import { Board as Base } from "../../Base";
-import { GridLines } from "../../Utils";
 import { IntBitBoard } from "../../BitBoard";
 
 export default class Board extends Base<3, 3, IntBitBoard> {
@@ -25,24 +24,5 @@ export default class Board extends Base<3, 3, IntBitBoard> {
         if (winner === 1)
             return -10;
         return 0;
-    }
-
-    public override toString(): string {
-        return `  A B C\n${super
-            .toString()
-            .trim()
-            .split("\n")
-            .map((line, i) => `${i + 1} ${line
-                .replace(/\s/gu, GridLines.Vertical)
-                .replace(/0/gu, " ")
-                .replace(/1/gu, "X")
-                .replace(/2/gu, "O")
-            }`)
-            .join(`\n${GridLines.Horizontal
-                .repeat(3)
-                .split("")
-                .join(GridLines.Cross)
-                .padStart(7)}\n`)
-            .trim()}`;
     }
 }

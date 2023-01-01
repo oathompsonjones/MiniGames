@@ -1,6 +1,7 @@
 import { IntBitBoard, LongInt, LongIntBitBoard } from "../BitBoard";
 import type { Position, Range } from "../Types";
 import type { BitBoard } from "../BitBoard";
+import { GridLines } from "../Utils";
 
 /**
  * Represent a game board.
@@ -243,17 +244,59 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      * Creates a string representation of the board.
      *
      * @public
+     * @param {boolean} [wrap=true] Whether or not to provide a border for the board.
+     * @param {boolean} [labelX=true] Whether or not to label x.
+     * @param {boolean} [labelY=true] Whether or not to label y.
+     * @param {string[]} [symbols=["x", "Y"]] The symbols to use as board pieces.
      * @returns {string} The string representation.
      */
-    public toString(): string {
-        let unformattedBoard = "";
+    public toString(wrap: boolean = true, labelX: boolean = true, labelY: boolean = true, symbols: string[] = ["X", "O"]): string {
+        const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+        const xLabels = labelX
+            ? `${alphabet.slice(0, this.boardWidth)
+                .split("")
+                .map((letter) => ` ${letter} `)
+                .join("")
+                .match(/.{3}/gu)!
+                .join(" ")
+                .padStart(3 * this.boardWidth + 2 + Number(wrap) + Number(labelY))
+            }\n`
+            : "";
+        const topBoarder = wrap
+            ? `${labelY ? " " : ""}${GridLines.TopLeft}${GridLines.Horizontal
+                .repeat(this.boardWidth * 3)
+                .match(/.{3}/gu)!
+                .join(GridLines.TTop)}${GridLines.TopRight}\n`
+            : "";
+        const bottomBoarder = wrap
+            ? `${labelY ? " " : ""}${GridLines.BottomLeft}${GridLines.Horizontal
+                .repeat(this.boardWidth * 3)
+                .match(/.{3}/gu)!
+                .join(GridLines.TBottom)}${GridLines.BottomRight}`
+            : "";
+        const rowSeparator = `${labelY ? " " : ""}${wrap ? GridLines.TLeft : ""}${GridLines.Horizontal
+            .repeat(this.boardWidth * 3)
+            .match(/.{3}/gu)!
+            .join(GridLines.Cross)}${wrap ? GridLines.TRight : ""}\n`;
+        const rows = [];
         for (let y = 0 as Range<Height>; y < this.boardHeight; y++) {
+            const yLabel = labelY ? `${y as number + 1}` : "";
+            const leftBoarder = wrap ? GridLines.Vertical : "";
+            const rightBoarder = wrap ? GridLines.Vertical : "";
+            let row = "";
             for (let x = 0 as Range<Width>; x < this.boardWidth; x++) {
-                const move = { x, y };
-                unformattedBoard += `${(this.cellOccupier(move) ?? -1) + 1}${x < this.boardWidth - 1 ? " " : "\n"}`;
+                const cell = { x, y };
+                const cellOccupier = this.cellOccupier(cell);
+                if (cellOccupier === null)
+                    row += "   ";
+                else
+                    row += ` ${symbols[cellOccupier]!} `;
             }
+            rows.push(`${yLabel}${leftBoarder}${row
+                .match(/.{3}/gu)!
+                .join(GridLines.Vertical)}${rightBoarder}\n`);
         }
-        return unformattedBoard;
+        return `${xLabels}${topBoarder}${rows.join(rowSeparator)}${bottomBoarder}`;
     }
 
     /**
