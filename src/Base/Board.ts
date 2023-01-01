@@ -21,7 +21,7 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      * @readonly
      * @type {BitBoardType}
      */
-    protected readonly data: BitBoardType;
+    protected readonly bitBoard: BitBoardType;
 
     /**
      * The width of the board.
@@ -94,7 +94,7 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
         this.numberOfPlayerBoards = playerBoardCount;
         this.numberOfBoards = this.numberOfPlayerBoards + extraBoardCount;
         const totalBits = this.boardWidth * this.boardHeight * this.numberOfBoards;
-        this.data = (totalBits > 32 ? new LongIntBitBoard(Math.ceil(totalBits / 32)) : new IntBitBoard()) as BitBoardType;
+        this.bitBoard = (totalBits > 32 ? new LongIntBitBoard(Math.ceil(totalBits / 32)) : new IntBitBoard()) as BitBoardType;
     }
 
     /**
@@ -105,12 +105,12 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      * @type {boolean}
      */
     public get isFull(): boolean {
-        let isFull = (this.data instanceof LongIntBitBoard
+        let isFull = (this.bitBoard instanceof LongIntBitBoard
             ? new LongIntBitBoard(Math.ceil(this.boardWidth * this.boardHeight / 32))
             : new IntBitBoard()) as BitBoardType;
         for (let i = 0; i < this.numberOfPlayerBoards; i++)
             isFull = isFull.or(this.getPlayerBoard(i));
-        const fullValue = this.data instanceof LongIntBitBoard
+        const fullValue = this.bitBoard instanceof LongIntBitBoard
             ? new LongInt([
                 ...Array<number>(Math.ceil(this.boardWidth * this.boardHeight / 32) - 1).fill(~0 >>> 0),
                 2 ** (this.boardWidth * this.boardHeight - (Math.ceil(this.boardWidth * this.boardHeight / 32) - 1) * 32) - 1
@@ -127,7 +127,7 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      * @type {boolean}
      */
     public get isEmpty(): boolean {
-        let isEmpty = (this.data instanceof LongIntBitBoard
+        let isEmpty = (this.bitBoard instanceof LongIntBitBoard
             ? new LongIntBitBoard(Math.ceil(this.boardWidth * this.boardHeight / 32))
             : new IntBitBoard()) as BitBoardType;
         for (let i = 0; i < this.numberOfPlayerBoards; i++)
@@ -198,7 +198,7 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
     public makeMove(move: Position<Range<Width>, Range<Height>>, playerId: number): void {
         const bit = this.getBitIndex(move, playerId);
         this.moves.push(bit);
-        this.data.setBit(bit);
+        this.bitBoard.setBit(bit);
     }
 
     /**
@@ -210,7 +210,7 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
         const lastMove = this.moves.pop();
         if (lastMove === undefined)
             throw new Error("No move to undo.");
-        this.data.clearBit(lastMove);
+        this.bitBoard.clearBit(lastMove);
     }
 
     /**
@@ -235,7 +235,7 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      */
     public cellOccupier(cell: Position<Range<Width>, Range<Height>>): number | null {
         for (let i = 0; i < this.numberOfPlayerBoards; i++) {
-            if (this.data.getBit(this.getBitIndex(cell, i)) === 1)
+            if (this.bitBoard.getBit(this.getBitIndex(cell, i)) === 1)
                 return i;
         }
         return null;
@@ -322,9 +322,9 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      * @returns {BitBoardType} The player's bits.
      */
     protected getPlayerBoard(playerId: number): BitBoardType {
-        const totalBits = (this.data instanceof LongIntBitBoard ? this.data.data.data.length : 1) * 32;
+        const totalBits = (this.bitBoard instanceof LongIntBitBoard ? this.bitBoard.data.wordCount : 1) * 32;
         const boardSize = this.boardWidth * this.boardHeight;
-        return this.data.leftShift(totalBits - boardSize * (playerId + 1)).rightShift(totalBits - boardSize);
+        return this.bitBoard.leftShift(totalBits - boardSize * (playerId + 1)).rightShift(totalBits - boardSize);
     }
 
     /**

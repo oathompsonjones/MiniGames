@@ -60,6 +60,17 @@ export class LongInt {
     }
 
     /**
+     * Gets the number of 32-bit words which make the LongInt.
+     *
+     * @public
+     * @readonly
+     * @type {number}
+     */
+    public get wordCount(): number {
+        return this.data.length;
+    }
+
+    /**
      * Carries out a bitwise and (&) operation on the two numbers.
      *
      * @public
