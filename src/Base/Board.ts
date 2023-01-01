@@ -259,7 +259,7 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
                 .join("")
                 .match(/.{3}/gu)!
                 .join(" ")
-                .padStart(3 * this.boardWidth + 2 + Number(wrap) + Number(labelY))
+                .padStart(4 * this.boardWidth - 1 + Number(wrap) + Number(labelY))
             }\n`
             : "";
         const topBoarder = wrap
