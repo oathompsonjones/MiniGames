@@ -110,12 +110,13 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
             : new IntBitBoard()) as BitBoardType;
         for (let i = 0; i < this.numberOfPlayerBoards; i++)
             isFull = isFull.or(this.getPlayerBoard(i));
-        if (isFull instanceof LongIntBitBoard) {
-            const arr = Array<number>(Math.ceil(this.boardWidth * this.boardHeight / 32)).fill(~0 >>> 0);
-            arr[arr.length - 1] = 2 ** (this.boardWidth * this.boardHeight - (arr.length - 1) * 32) - 1;
-            return isFull.equals(new LongInt(arr));
-        }
-        return isFull.equals(2 ** (this.boardWidth * this.boardHeight) - 1);
+        const fullValue = this.data instanceof LongIntBitBoard
+            ? new LongInt([
+                ...Array<number>(Math.ceil(this.boardWidth * this.boardHeight / 32) - 1).fill(~0 >>> 0),
+                2 ** (this.boardWidth * this.boardHeight - (Math.ceil(this.boardWidth * this.boardHeight / 32) - 1) * 32) - 1
+            ])
+            : 2 ** (this.boardWidth * this.boardHeight) - 1;
+        return isFull.equals(fullValue);
     }
 
     /**
