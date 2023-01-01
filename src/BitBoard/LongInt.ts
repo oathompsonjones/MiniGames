@@ -453,7 +453,7 @@ export class LongInt {
      */
     private shiftArrayLeft(count: number, fillValue: number = 0): this {
         if (count < 0)
-            return this.shiftArrayLeft(-count, fillValue);
+            return this.shiftArrayRight(-count, fillValue);
         for (let i = 0; i < this.data.length; i++)
             this.data[i] = this.data[i + count] ?? fillValue;
         return this;
