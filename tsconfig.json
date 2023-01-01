@@ -1,10 +1,8 @@
 {
     "extends": "@oathompsonjones/ts-config",
-    "exclude": [
-        "**/Ignore"
-    ],
     "include": [
-        "src"
+        "src",
+        "src/**/**.test.ts"
     ],
     "compilerOptions": {
         "experimentalDecorators": true,
