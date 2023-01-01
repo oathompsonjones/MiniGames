@@ -13,9 +13,25 @@ export class LongIntBitBoard extends BitBoard<LongInt> {
      *
      * @constructor
      * @public
-     * @param {LongInt} [longInt=new LongInt(Array<number>(2).fill(0))] The data to fill the BitBoard with.
+     * @param {LongInt} longInt The data to fill the BitBoard with.
     */
     public constructor(longInt: LongInt);
+    /**
+     * Creates an instance of LongIntBitBoard.
+     *
+     * @constructor
+     * @public
+     * @param {Uint32Array} uint32Array The data to fill the BitBoard with.
+     */
+    public constructor(uint32Array: Uint32Array);
+    /**
+     * Creates an instance of LongIntBitBoard.
+     *
+     * @constructor
+     * @public
+     * @param {number[]} numberArray The data to fill the BitBoard with.
+     */
+    public constructor(numberArray: number[]);
     /**
      * Creates an instance of LongIntBitBoard.
      *
@@ -24,13 +40,15 @@ export class LongIntBitBoard extends BitBoard<LongInt> {
      * @param {number} [length=2] The length of the LongInt.
      */
     public constructor(length: number);
-    public constructor(args?: LongInt | number) {
+    public constructor(args?: LongInt | number[] | Uint32Array | number) {
         if (args === undefined)
-            super(new LongInt(Array<number>(2).fill(0)));
-        else if (typeof args === "number")
-            super(new LongInt(Array<number>(args).fill(0)));
+            super(new LongInt(Array(2).fill(0)));
         else if (args instanceof LongInt)
             super(args);
+        else if (args instanceof Uint32Array || args instanceof Array)
+            super(new LongInt(args));
+        else if (typeof args === "number")
+            super(new LongInt(Array(args).fill(0)));
     }
 
     public getBit(bit: number): 0 | 1 {
