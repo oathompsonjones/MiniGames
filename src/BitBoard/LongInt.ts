@@ -54,7 +54,7 @@ export class LongInt {
         if (args instanceof Array || args instanceof Uint32Array)
             this.data = new Uint32Array(args);
         else if (args instanceof LongInt)
-            this.data = args.data;
+            this.data = new Uint32Array(args.data);
         else
             this.data = new Uint32Array(args).fill(0);
     }
