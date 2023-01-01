@@ -280,10 +280,15 @@ export class LongInt {
      * @returns {this} The result of this << shiftAmount.
      */
     public leftShift(shiftAmount: number): this {
-        this.shiftArrayRight(Math.floor(shiftAmount / 32));
-        const singleShiftAmount = shiftAmount % 32;
-        for (let i = this.data.length - 1; i >= 0; i--)
-            this.data[i] = this.data[i]! << singleShiftAmount | (i === 0 ? 0 : this.data[i + 1]! >>> 32 - singleShiftAmount);
+        if (shiftAmount === 0)
+            return this;
+        if (shiftAmount > 31)
+            this.shiftArrayRight(Math.floor(shiftAmount / 32));
+        if (shiftAmount !== 32) {
+            const singleShiftAmount = shiftAmount % 32;
+            for (let i = this.data.length - 1; i >= 0; i--)
+                this.data[i] = this.data[i]! << singleShiftAmount | this.data[i - 1]! >>> 32 - singleShiftAmount;
+        }
         return this;
     }
 
@@ -296,10 +301,15 @@ export class LongInt {
      * @returns {this} The result of this >>> shiftAmount.
      */
     public rightShift(shiftAmount: number): this {
-        const singleShiftAmount = shiftAmount % 32;
-        for (let i = 0; i < this.data.length; i++)
-            this.data[i] = this.data[i]! >>> singleShiftAmount | (i === this.data.length - 1 ? 0 : this.data[i + 1]! << 32 - singleShiftAmount);
-        this.shiftArrayLeft(Math.floor(shiftAmount / 32));
+        if (shiftAmount === 0)
+            return this;
+        if (shiftAmount !== 32) {
+            const singleShiftAmount = shiftAmount % 32;
+            for (let i = 0; i < this.data.length; i++)
+                this.data[i] = this.data[i]! >>> singleShiftAmount | this.data[i + 1]! << 32 - singleShiftAmount;
+        }
+        if (shiftAmount > 31)
+            this.shiftArrayLeft(Math.floor(shiftAmount / 32));
         return this;
     }
 
@@ -312,10 +322,15 @@ export class LongInt {
      * @returns {this} The result of this >> shiftAmount.
      */
     public arithmeticRightShift(shiftAmount: number): this {
-        const singleShiftAmount = shiftAmount % 32;
-        for (let i = 0; i < this.data.length; i++)
-            this.data[i] = this.data[i]! >> singleShiftAmount | (i === this.data.length - 1 ? 0 : this.data[i + 1]! << 32 - singleShiftAmount);
-        this.shiftArrayLeft(Math.floor(shiftAmount / 32), ~0 >>> 0);
+        if (shiftAmount === 0)
+            return this;
+        if (shiftAmount !== 32) {
+            const singleShiftAmount = shiftAmount % 32;
+            for (let i = 0; i < this.data.length; i++)
+                this.data[i] = this.data[i]! >> singleShiftAmount | this.data[i + 1]! << 32 - singleShiftAmount;
+        }
+        if (shiftAmount > 31)
+            this.shiftArrayLeft(Math.floor(shiftAmount / 32), ~0 >>> 0);
         return this;
     }
 
