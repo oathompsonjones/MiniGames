@@ -2,16 +2,8 @@ import { Board as Base } from "../../Base";
 import { IntBitBoard } from "../../BitBoard";
 
 export default class Board extends Base<3, 3, IntBitBoard> {
-    protected winningStates: IntBitBoard[] = [
-        new IntBitBoard(0b000000111),
-        new IntBitBoard(0b000111000),
-        new IntBitBoard(0b111000000),
-        new IntBitBoard(0b001001001),
-        new IntBitBoard(0b010010010),
-        new IntBitBoard(0b100100100),
-        new IntBitBoard(0b100010001),
-        new IntBitBoard(0b001010100)
-    ];
+    protected winningStates: IntBitBoard[] = [0x007, 0x038, 0x1C0, 0x049, 0x092, 0x124, 0x111, 0x054]
+        .map((data) => new IntBitBoard(data));
 
     public constructor() {
         super(3, 3);
