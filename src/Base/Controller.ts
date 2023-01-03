@@ -105,26 +105,52 @@ export abstract class Controller<BoardWidth extends number, BoardHeight extends 
      * @link https://en.wikipedia.org/wiki/Minimax
      * @public
      * @param {number} [depth=Infinity] The depth of the algorithm.
+     * @param {number} [alpha=-Infinity] The bounds for the alpha-beta variation of the algorithm.
+     * @param {number} [beta=Infinity] The bounds for the alpha-beta variation of the algorithm.
      * @param {boolean} [maximisingPlayer=true] Whether or not the current player is the maximising player.
      * @returns {Minimax<BoardWidth, BoardHeight>} The optimal move.
      */
-    public minimax(depth: number = Infinity, maximisingPlayer: boolean = true): Minimax<BoardWidth, BoardHeight> {
+    public minimax(
+        depth: number = Infinity,
+        alpha: number = -Infinity,
+        beta: number = Infinity,
+        maximisingPlayer: boolean = true
+    ): Minimax<BoardWidth, BoardHeight> {
         const playerIds = [(this.currentPlayerId + 1) % 2, this.currentPlayerId];
         if (depth === 0 || this.board.winner !== false) {
             return {
-                move:  null as unknown as Minimax<BoardWidth, BoardHeight>["move"],
+                move:  { x: null, y: null },
                 score: this.board.heuristic * (this.currentPlayerId === 1 ? 1 : -1)
-            };
+            } as Minimax<BoardWidth, BoardHeight>;
         }
-        const scores: Array<Minimax<BoardWidth, BoardHeight>> = [];
+        let bestMove: Minimax<BoardWidth, BoardHeight> = {
+            move:  { x: null, y: null },
+            score: maximisingPlayer ? -Infinity : Infinity
+        } as Minimax<BoardWidth, BoardHeight>;
         const { emptyCells } = this.board;
         for (const move of emptyCells) {
             this.board.makeMove(move, playerIds[Number(maximisingPlayer)]!);
-            const score = emptyCells.length * this.minimax(depth - 1, !maximisingPlayer).score;
-            scores.push({ move, score });
+            const score = emptyCells.length * this.minimax(depth - 1, alpha, beta, !maximisingPlayer).score;
             this.board.undoLastMove();
+            if (maximisingPlayer) {
+                const bestScore = Math.max(score, bestMove.score);
+                if (bestScore !== bestMove.score)
+                    bestMove = { move, score };
+                if (bestMove.score > beta)
+                    break;
+                // eslint-disable-next-line no-param-reassign
+                alpha = Math.max(alpha, bestMove.score);
+            } else {
+                const bestScore = Math.min(score, bestMove.score);
+                if (bestScore !== bestMove.score)
+                    bestMove = { move, score };
+                if (bestMove.score < alpha)
+                    break;
+                // eslint-disable-next-line no-param-reassign
+                beta = Math.min(beta, bestMove.score);
+            }
         }
-        return scores.sort((a, b) => (maximisingPlayer ? a.score - b.score : b.score - a.score))[0]!;
+        return bestMove;
     }
 
     /**
