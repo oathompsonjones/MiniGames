@@ -1,8 +1,8 @@
 {
     "dependencies": {
-        "@oathompsonjones/eslint-config": "^0.0.34",
-        "@oathompsonjones/ts-config": "^0.0.6",
-        "@types/node": "^18.11.17"
+        "@oathompsonjones/eslint-config": "^0.0.52",
+        "@oathompsonjones/ts-config": "^0.0.19",
+        "@types/node": "^20.1.4"
     },
     "name": "minigames",
     "description": "This repository contains a selection of MiniGames. You can play these games on [my website](https://oathompsonjones.co.uk/arcade).",
