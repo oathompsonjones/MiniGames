@@ -1,8 +1,7 @@
 {
-    "extends": "@oathompsonjones/eslint-config/TypeScript/Node",
+    "extends": "@oathompsonjones/eslint-config",
     "ignorePatterns": [
-        "Ignore",
-        "**/*.js"
+        "Ignore"
     ],
     "parserOptions": {
         "project": "./tsconfig.json"
