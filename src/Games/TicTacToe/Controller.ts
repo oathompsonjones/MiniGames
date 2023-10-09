@@ -1,11 +1,11 @@
 import type { PlayerType, RenderType } from "../../Base/Controller.js";
-import { Controller as Base } from "../../Base/Controller.js";
+import Base from "../../Base/Controller.js";
 import Board from "./Board.js";
-import { Console } from "../../Base/Console.js";
-import type { IntBitBoard } from "../../BitBoard/IntBitBoard.js";
+import Console from "../../Base/Console.js";
+import type IntBitBoard from "../../BitBoard/IntBitBoard.js";
 import type { Position } from "../../Base/Board.js";
 
-export class Controller extends Base<IntBitBoard> {
+export default class TicTacToe extends Base<IntBitBoard> {
     public constructor(renderType: RenderType, playerOneType: PlayerType, playerTwoType: PlayerType) {
         super(new Board(), [playerOneType, playerTwoType], renderType);
     }

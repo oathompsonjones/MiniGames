@@ -1,7 +1,7 @@
-import type { BitBoard } from "../BitBoard/BitBoard.js";
-import { IntBitBoard } from "../BitBoard/IntBitBoard.js";
-import { LongInt } from "../BitBoard/LongInt.js";
-import { LongIntBitBoard } from "../BitBoard/LongIntBitBoard.js";
+import type BitBoard from "../BitBoard/BitBoard.js";
+import IntBitBoard from "../BitBoard/IntBitBoard.js";
+import LongInt from "../BitBoard/LongInt.js";
+import LongIntBitBoard from "../BitBoard/LongIntBitBoard.js";
 
 export interface Position {
     y: number;
@@ -35,7 +35,7 @@ export const enum GridLines {
  * @typedef {Board}
  * @template BitBoardType extends BitBoard
  */
-export abstract class Board<BitBoardType extends BitBoard> {
+export default abstract class Board<BitBoardType extends BitBoard> {
     /**
      * Contains the data stored in a BitBoard.
      *

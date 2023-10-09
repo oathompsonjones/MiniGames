@@ -1,4 +1,5 @@
-import type { LongInt, StringType } from "./LongInt.js";
+import type LongInt from "./LongInt.js";
+import type { StringType } from "./LongInt.js";
 
 /**
  * A BitBoard.
@@ -11,7 +12,7 @@ import type { LongInt, StringType } from "./LongInt.js";
  * @template Height extends number
  * @template DataType extends LongInt | number = LongInt | number
  */
-export abstract class BitBoard<DataType extends LongInt | number = LongInt | number> {
+export default abstract class BitBoard<DataType extends LongInt | number = LongInt | number> {
     /**
      * The numeric data.
      *

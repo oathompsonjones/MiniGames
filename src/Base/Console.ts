@@ -31,4 +31,5 @@ function clear(): void {
     return console.clear();
 }
 
-export const Console = { clear, readLine, writeLine };
+const Console = { clear, readLine, writeLine };
+export default Console;

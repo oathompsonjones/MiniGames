@@ -9,7 +9,7 @@ export type StringType = 2 | 10 | 16;
  * @typedef {LongInt}
  * @extends {Uint32Array}
  */
-export class LongInt {
+export default class LongInt {
     /**
      * Holds the array of 32-bit numbers.
      *

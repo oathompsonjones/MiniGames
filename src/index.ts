@@ -1,7 +1,7 @@
-import { Controller as Connect4 } from "./Games/Connect4/Controller.js";
-import { Console } from "./Base/Console.js";
+import Connect4 from "./Games/Connect4/Controller.js";
+import Console from "./Base/Console.js";
 import type { PlayerType } from "./Base/Controller.js";
-import { Controller as TicTacToe } from "./Games/TicTacToe/Controller.js";
+import TicTacToe from "./Games/TicTacToe/Controller.js";
 
 const games = [
     { Game: TicTacToe, name: "Tic Tac Toe" },

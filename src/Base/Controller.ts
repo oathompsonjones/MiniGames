@@ -1,13 +1,9 @@
-import type { Board, Position } from "./Board.js";
-import type { BitBoard } from "../BitBoard/BitBoard.js";
+import type BitBoard from "../BitBoard/BitBoard.js";
+import type Board from "./Board.js";
+import type { Position } from "./Board.js";
 
 export type RenderType = "canvas" | "console";
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
-
-interface Player<Type extends PlayerType> {
-    id: number;
-    playerType: Type;
-}
 
 /**
  * Represents a game controller.
@@ -17,7 +13,7 @@ interface Player<Type extends PlayerType> {
  * @typedef {Controller}
  * @template BoardType extends BitBoard
  */
-export abstract class Controller<BoardType extends BitBoard> {
+export default abstract class Controller<BoardType extends BitBoard = BitBoard> {
     /**
      * Contains the board.
      *
@@ -34,7 +30,10 @@ export abstract class Controller<BoardType extends BitBoard> {
      * @readonly
      * @type {Array<Player<PlayerType>>}
      */
-    protected readonly players: Array<Player<PlayerType>>;
+    protected readonly players: Array<{
+        id: number;
+        playerType: PlayerType;
+    }>;
 
     /**
      * Contains the rendering type.
@@ -75,7 +74,10 @@ export abstract class Controller<BoardType extends BitBoard> {
      * @readonly
      * @type {Player<PlayerType>}
      */
-    public get currentPlayer(): Player<PlayerType> {
+    public get currentPlayer(): {
+        id: number;
+        playerType: PlayerType;
+    } {
         return this.players[this.currentPlayerId]!;
     }
 

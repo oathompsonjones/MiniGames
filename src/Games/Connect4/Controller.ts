@@ -1,11 +1,11 @@
 import type { PlayerType, RenderType } from "../../Base/Controller.js";
-import { Controller as Base } from "../../Base/Controller.js";
+import Base from "../../Base/Controller.js";
 import Board from "./Board.js";
-import { Console } from "../../Base/Console.js";
-import type { LongIntBitBoard } from "../../BitBoard/LongIntBitBoard.js";
+import Console from "../../Base/Console.js";
+import type LongIntBitBoard from "../../BitBoard/LongIntBitBoard.js";
 import type { Position } from "../../Base/Board.js";
 
-export class Controller extends Base<LongIntBitBoard> {
+export default class Connect4 extends Base<LongIntBitBoard> {
     public constructor(renderType: RenderType, playerOneType: PlayerType, playerTwoType: PlayerType) {
         super(new Board(), [playerOneType, playerTwoType], renderType);
     }
