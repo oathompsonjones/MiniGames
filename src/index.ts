@@ -4,8 +4,8 @@ import type { PlayerType } from "./Base/Controller.js";
 import TicTacToe from "./Games/TicTacToe/Controller.js";
 
 const games = [
-    { Game: TicTacToe, name: "Tic Tac Toe" },
-    { Game: Connect4, name: "Connect 4" }
+    TicTacToe,
+    Connect4
 ];
 
 Console.clear();
@@ -52,7 +52,7 @@ if (playerCount === 1) {
     } while (difficulty === undefined);
 }
 
-const { Game } = games[gameChoiceIndex]!;
+const Game = games[gameChoiceIndex]!;
 const playerOneType = playerCount > 0 ? "human" : "impossibleCPU";
 const playerTwoType = playerCount > 1 ? "human" : difficulty ?? "impossibleCPU";
 
