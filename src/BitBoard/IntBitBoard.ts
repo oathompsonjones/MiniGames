@@ -1,11 +1,11 @@
-import { BitBoard } from "./";
+import { BitBoard } from "./BitBoard.js";
 
 /**
  * A BitBoard which uses just one 32-bit number.
  *
  * @class NumberBitBoard
  * @typedef {IntBitBoard}
- * @extends {BitBoard<Width, Height, number>}
+ * @extends {BitBoard<number>}
  */
 export class IntBitBoard extends BitBoard<number> {
     /**

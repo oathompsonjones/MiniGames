@@ -1,11 +1,12 @@
-import { BitBoard, LongInt } from "./";
+import { BitBoard } from "./BitBoard.js";
+import { LongInt } from "./LongInt.js";
 
 /**
  * A BitBoard which uses an array of 32-bit numbers.
  *
  * @class LongIntBitBoard
  * @typedef {LongIntBitBoard}
- * @extends {BitBoard<Width, Height, LongInt>}
+ * @extends {BitBoard<LongInt>}
  */
 export class LongIntBitBoard extends BitBoard<LongInt> {
     /**

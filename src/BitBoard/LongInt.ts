@@ -1,4 +1,4 @@
-import { StringType } from "../Utils";
+export type StringType = 2 | 10 | 16;
 
 /**
  * Represents a long integer using an array of 32-bit numbers.
@@ -358,19 +358,19 @@ export class LongInt {
      * Returns a string representation of the LongInt.
      *
      * @public
-     * @param {StringType} [type=StringType.Hex] The base of the string to print.
+     * @param {StringType} [type=16] The base of the string to print.
      * @returns {string} The string representation.
      */
     public toString(type: StringType): string {
         let padLength = 0;
         switch (type) {
-            case StringType.Binary:
+            case 2:
                 padLength = 32;
                 break;
-            case StringType.Decimal:
+            case 10:
                 padLength = 10;
                 break;
-            case StringType.Hex:
+            case 16:
                 padLength = 8;
                 break;
         }

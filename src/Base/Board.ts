@@ -1,7 +1,31 @@
-import { IntBitBoard, LongInt, LongIntBitBoard } from "../BitBoard";
-import type { Position, Range } from "../Types";
-import type { BitBoard } from "../BitBoard";
-import { GridLines } from "../Utils";
+import type { BitBoard } from "../BitBoard/BitBoard.js";
+import { IntBitBoard } from "../BitBoard/IntBitBoard.js";
+import { LongInt } from "../BitBoard/LongInt.js";
+import { LongIntBitBoard } from "../BitBoard/LongIntBitBoard.js";
+
+export interface Position {
+    y: number;
+    x: number;
+}
+
+/**
+ * Defines the characters used to draw a grid.
+ *
+ * @enum {number}
+ */
+export const enum GridLines {
+    Horizontal = "\u2500",
+    Vertical = "\u2502",
+    TopLeft = "\u250C",
+    TopRight = "\u2510",
+    BottomLeft = "\u2514",
+    BottomRight = "\u2518",
+    TLeft = "\u251C",
+    TRight = "\u2524",
+    TTop = "\u252C",
+    TBottom = "\u2534",
+    Cross = "\u253C"
+}
 
 /**
  * Represent a game board.
@@ -9,11 +33,9 @@ import { GridLines } from "../Utils";
  * @abstract
  * @class Board
  * @typedef {Board}
- * @template Width extends number
- * @template Height extends number
  * @template BitBoardType extends BitBoard
  */
-export abstract class Board<Width extends number, Height extends number, BitBoardType extends BitBoard> {
+export abstract class Board<BitBoardType extends BitBoard> {
     /**
      * Contains the data stored in a BitBoard.
      *
@@ -28,18 +50,18 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      *
      * @protected
      * @readonly
-     * @type {Width}
+     * @type {number}
      */
-    protected readonly boardWidth: Width;
+    protected readonly boardWidth: number;
 
     /**
      * The height of the board.
      *
      * @protected
      * @readonly
-     * @type {Height}
+     * @type {number}
      */
-    protected readonly boardHeight: Height;
+    protected readonly boardHeight: number;
 
     /**
      * A stack of moves.
@@ -83,12 +105,12 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      *
      * @constructor
      * @protected
-     * @param {Width} width The width of the board.
-     * @param {Height} height The height of the board.
+     * @param {number} width The width of the board.
+     * @param {number} height The height of the board.
      * @param {number} playerBoardCount How many boards there are representing player positions (most likely 2).
      * @param {number} [extraBoardCount=0] Number of extra boards (most likely 0).
      */
-    protected constructor(width: Width, height: Height, playerBoardCount: number = 2, extraBoardCount: number = 0) {
+    protected constructor(width: number, height: number, playerBoardCount: number = 2, extraBoardCount: number = 0) {
         this.boardWidth = width;
         this.boardHeight = height;
         this.numberOfPlayerBoards = playerBoardCount;
@@ -143,9 +165,9 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      *
      * @public
      * @readonly
-     * @type {(number | false | null)}
+     * @type {(0 | 1 | false | null)}
      */
-    public get winner(): number | false | null {
+    public get winner(): 0 | 1 | false | null {
         const playerOneBoard = this.getPlayerBoard(0);
         const playerTwoBoard = this.getPlayerBoard(1);
         for (const state of this.winningStates) {
@@ -164,13 +186,13 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      *
      * @public
      * @readonly
-     * @type {Array<Position<Range<Width>, Range<Height>>>}
+     * @type {Position[]}
      */
-    public get emptyCells(): Array<Position<Range<Width>, Range<Height>>> {
-        const emptyCells: Array<Position<Range<Width>, Range<Height>>> = [];
+    public get emptyCells(): Position[] {
+        const emptyCells: Position[] = [];
         for (let y = 0; y < this.boardHeight; y++) {
             for (let x = 0; x < this.boardWidth; x++) {
-                const cell = { x, y } as Position<Range<Width>, Range<Height>>;
+                const cell = { x, y } as Position;
                 if (this.cellOccupier(cell) === null)
                     emptyCells.push(cell);
             }
@@ -192,10 +214,10 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      * Makes a move on the board.
      *
      * @public
-     * @param {Position<Range<Width>, Range<Height>>} move The position of the move.
+     * @param {Position} move The position of the move.
      * @param {number} playerId The player who's making the move.
      */
-    public makeMove(move: Position<Range<Width>, Range<Height>>, playerId: number): void {
+    public makeMove(move: Position, playerId: number): void {
         const bit = this.getBitIndex(move, playerId);
         this.moves.push(bit);
         this.bitBoard.setBit(bit);
@@ -221,19 +243,17 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      * @returns {boolean} Whether or not it's valid.
      */
     public moveIsValid(move: Position): boolean {
-        const isWithinBoard = move.x >= 0 && move.x < this.boardWidth && move.y >= 0 && move.y < this.boardHeight;
-        const notOccupied = this.cellOccupier(move as Position<Range<Width>, Range<Height>>) === null;
-        return isWithinBoard && notOccupied;
+        return this.isValidPosition(move) && this.cellOccupier(move) === null;
     }
 
     /**
      * Checks which player is occupying a given cell.
      *
      * @public
-     * @param {Position<Range<Width>, Range<Height>>} cell The cell to check.
+     * @param {Position} cell The cell to check.
      * @returns {(number | null)} If the cell is empty, the output is null, otherwise the output is the player's ID.
      */
-    public cellOccupier(cell: Position<Range<Width>, Range<Height>>): number | null {
+    public cellOccupier(cell: Position): number | null {
         for (let i = 0; i < this.numberOfPlayerBoards; i++) {
             if (this.bitBoard.getBit(this.getBitIndex(cell, i)) === 1)
                 return i;
@@ -280,12 +300,12 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
             .match(/.{3}/gu)!
             .join(GridLines.Cross)}${wrap ? GridLines.TRight : ""}\n`;
         const rows = [];
-        for (let y = 0 as Range<Height>; y < this.boardHeight; y++) {
-            const yLabel = labelY ? `${y as number + 1}` : "";
+        for (let y = 0; y < this.boardHeight; y++) {
+            const yLabel = labelY ? `${y + 1}` : "";
             const leftBoarder = wrap ? GridLines.Vertical : "";
             const rightBoarder = wrap ? GridLines.Vertical : "";
             let row = "";
-            for (let x = 0 as Range<Width>; x < this.boardWidth; x++) {
+            for (let x = 0; x < this.boardWidth; x++) {
                 const cell = { x, y };
                 const cellOccupier = this.cellOccupier(cell);
                 if (cellOccupier === null)
@@ -301,14 +321,58 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
     }
 
     /**
+     * Determines if a given player has a line of pieces on the board.
+     *
+     * @public
+     * @param {number} playerId The ID of the player.
+     * @param {number} length The number of pieces needed.
+     * @param {number} [maxGaps=0] The number of gaps allowed for a line to be valid. Defaults to 0.
+     * @returns {number} How many lines exist.
+     */
+    public hasLine(playerId: number, length: number, maxGaps: number = 0): number {
+        if (length > Math.max(this.boardWidth, this.boardHeight))
+            return 0;
+        const DIRECTIONS: [Position, Position, Position, Position] = [{ x: 1, y: 0 }, { x: 0, y: 1 }, { x: 1, y: 1 }, { x: 1, y: -1 }];
+        let lineCount = 0;
+        let gaps: [number, number, number, number] = [0, 0, 0, 0];
+        let lengths: [number, number, number, number] = [0, 0, 0, 0];
+        const checkCell = (x: number, y: number, direction: 0 | 1 | 2 | 3): void => {
+            const cell = { x, y } as Position;
+            if (this.isValidPosition(cell)) {
+                const cellOccupier = this.cellOccupier(cell);
+                if (cellOccupier === null)
+                    gaps[direction]++;
+                else if (cellOccupier === playerId)
+                    lengths[direction]++;
+            }
+        };
+        for (let x = 0; x < this.boardWidth; x++) {
+            for (let y = 0; y < this.boardHeight; y++) {
+                gaps = [0, 0, 0, 0];
+                lengths = [0, 0, 0, 0];
+                for (let i = 0; i < length; i++) {
+                    for (let j = 0 as 0 | 1 | 2 | 3; j < 4; j++) {
+                        if (gaps[j] > maxGaps)
+                            continue;
+                        checkCell(x + i * DIRECTIONS[j].x, y + i * DIRECTIONS[j].y, j);
+                        if (lengths[j] === length)
+                            lineCount++;
+                    }
+                }
+            }
+        }
+        return lineCount;
+    }
+
+    /**
      * Gets a bit index from its coordinates and player ID.
      *
      * @protected
-     * @param {Position<Range<Width>, Range<Height>>} move The coordinates.
+     * @param {Position} move The coordinates.
      * @param {number} playerId The player ID.
      * @returns {number} The bit index.
      */
-    protected getBitIndex(move: Position<Range<Width>, Range<Height>>, playerId: number): number {
+    protected getBitIndex(move: Position, playerId: number): number {
         const moveIndex = this.getIndex(move);
         const bitBoardMoveIndex = moveIndex + this.boardWidth * this.boardHeight * playerId;
         return bitBoardMoveIndex;
@@ -331,10 +395,22 @@ export abstract class Board<Width extends number, Height extends number, BitBoar
      * Gets a bit index from its coordinates.
      *
      * @private
-     * @param {Position<Range<Width>, Range<Height>>} move The coordinates.
+     * @param {Position} move The coordinates.
      * @returns {number} The bit index.
      */
-    private getIndex(move: Position<Range<Width>, Range<Height>>): number {
-        return (this.boardWidth as number) * (move.y as number) + (move.x as number);
+    private getIndex(move: Position): number {
+        return this.boardWidth * move.y + move.x;
+    }
+
+    /**
+     * Checks if a move is valid for the given board.
+     * Does not check if that cell is already occupied.
+     *
+     * @private
+     * @param {Position} position The position to check.
+     * @returns {boolean} Whether or not that cell exists on the board.
+     */
+    private isValidPosition(position: Position): boolean {
+        return position.x >= 0 && position.x < this.boardWidth && position.y >= 0 && position.y < this.boardHeight;
     }
 }
