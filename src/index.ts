@@ -1,41 +1,64 @@
-import { TicTacToe } from "./Games";
-import { Console, PlayerType, RenderType } from "./Utils";
+import { Controller as Connect4 } from "./Games/Connect4/Controller.js";
+import { Console } from "./Base/Console.js";
+import type { PlayerType } from "./Base/Controller.js";
+import { Controller as TicTacToe } from "./Games/TicTacToe/Controller.js";
 
-const games = [{ Game: TicTacToe, name: "Tic Tac Toe" }];
+const games = [
+    { Game: TicTacToe, name: "Tic Tac Toe" },
+    { Game: Connect4, name: "Connect 4" }
+];
 
-void (async (): Promise<unknown> => {
+Console.clear();
+
+const start = await Console.readLine("Would you like to play a game? (Y/N) ");
+if (start.toLowerCase() !== "y")
+    process.exit(0);
+
+let gameChoiceIndex = NaN;
+
+do {
     Console.clear();
-    const start = await Console.readLine("Would you like to play a game? (Y/N) ");
-    if (start.toLowerCase() !== "y")
-        return;
-    let gameChoiceIndex = NaN;
+    // eslint-disable-next-line no-await-in-loop
+    const selectGame = await Console.readLine(`Select a game (1-${games.length}):\n${games
+        .map(({ name }, i) => `${i + 1}. ${name}`)
+        .join("\n")}\n`);
+    gameChoiceIndex = parseInt(selectGame, 10) - 1;
+} while (isNaN(gameChoiceIndex) || gameChoiceIndex < 0 || gameChoiceIndex > games.length - 1);
+
+let playerCount = NaN;
+
+do {
+    Console.clear();
+    // eslint-disable-next-line no-await-in-loop
+    const selectPlayers = await Console.readLine("How many players? (0-2) ");
+    playerCount = parseInt(selectPlayers, 10);
+} while (isNaN(playerCount) || playerCount < 0 || playerCount > 2);
+
+let difficulty: PlayerType | undefined;
+
+if (playerCount === 1) {
     do {
         Console.clear();
         // eslint-disable-next-line no-await-in-loop
-        const selectGame = await Console.readLine(`Select a game (1-${games.length}):\n${games
-            .map(({ name }, i) => `${i + 1}. ${name}`)
-            .join("\n")}\n`);
-        gameChoiceIndex = parseInt(selectGame, 10) - 1;
-    } while (isNaN(gameChoiceIndex) || gameChoiceIndex < 0 || gameChoiceIndex > games.length - 1);
-    let playerCount = NaN;
-    do {
-        Console.clear();
-        // eslint-disable-next-line no-await-in-loop
-        const selectPlayers = await Console.readLine("How many players? (0-2) ");
-        playerCount = parseInt(selectPlayers, 10);
-    } while (isNaN(playerCount) || playerCount < 0 || playerCount > 2);
-    let difficulty;
-    if (playerCount === 1) {
-        do {
-            Console.clear();
-            // eslint-disable-next-line no-await-in-loop
-            const selectDifficulty = await Console.readLine("Select a difficulty (1-4):\n1. Easy\n2. Medium\n3. Hard\n4. Impossible\n");
-            const difficulties = [PlayerType.EasyCPU, PlayerType.MediumCPU, PlayerType.HardCPU, PlayerType.ImpossibleCPU];
-            difficulty = difficulties[parseInt(selectDifficulty, 10) - 1];
-        } while (difficulty === undefined);
-    }
-    const { Game } = games[gameChoiceIndex]!;
-    const playerOneType = playerCount > 0 ? PlayerType.Human : PlayerType.ImpossibleCPU;
-    const playerTwoType = playerCount > 1 ? PlayerType.Human : difficulty ?? PlayerType.ImpossibleCPU;
-    return new Game(RenderType.Console, playerOneType, playerTwoType).play();
-})();
+        const selectDifficulty = await Console.readLine([
+            "Select a difficulty (1-4):",
+            "1. Easy",
+            "2. Medium",
+            "3. Hard",
+            "4. Impossible\n"
+        ].join("\n"));
+        const difficulties: PlayerType[] = ["easyCPU", "mediumCPU", "hardCPU", "impossibleCPU"];
+        difficulty = difficulties[parseInt(selectDifficulty, 10) - 1];
+    } while (difficulty === undefined);
+}
+
+const { Game } = games[gameChoiceIndex]!;
+const playerOneType = playerCount > 0 ? "human" : "impossibleCPU";
+const playerTwoType = playerCount > 1 ? "human" : difficulty ?? "impossibleCPU";
+
+const winners = [];
+for (let i = 0; i < 1000; i++)
+    winners.push(new Game("console", playerOneType, playerTwoType).play());
+const resolvedWinners = await Promise.all(winners);
+const alwaysATie = resolvedWinners.every((winner) => winner === null);
+console.log(alwaysATie ? `${winners.length} ties!` : "Not always a draw");
