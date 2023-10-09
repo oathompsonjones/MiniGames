@@ -57,8 +57,11 @@ const playerOneType = playerCount > 0 ? "human" : "impossibleCPU";
 const playerTwoType = playerCount > 1 ? "human" : difficulty ?? "impossibleCPU";
 
 const winners = [];
-for (let i = 0; i < 1000; i++)
-    winners.push(new Game("console", playerOneType, playerTwoType).play());
-const resolvedWinners = await Promise.all(winners);
-const alwaysATie = resolvedWinners.every((winner) => winner === null);
-Console.writeLine(alwaysATie ? `${winners.length} ties!` : "Not always a draw");
+if (playerCount > 0) {
+    void new Game("console", playerOneType, playerTwoType).play();
+} else {
+    for (let i = 0; i < 1000; i++)
+        winners.push(new Game("console", playerOneType, playerTwoType).play());
+    const alwaysATie = (await Promise.all(winners)).every((winner) => winner === null);
+    Console.writeLine(alwaysATie ? `${winners.length} ties!` : "Not always a draw");
+}
