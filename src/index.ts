@@ -61,4 +61,4 @@ for (let i = 0; i < 1000; i++)
     winners.push(new Game("console", playerOneType, playerTwoType).play());
 const resolvedWinners = await Promise.all(winners);
 const alwaysATie = resolvedWinners.every((winner) => winner === null);
-console.log(alwaysATie ? `${winners.length} ties!` : "Not always a draw");
+Console.writeLine(alwaysATie ? `${winners.length} ties!` : "Not always a draw");
