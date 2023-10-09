@@ -1,15 +1,19 @@
 {
     "dependencies": {
-        "@oathompsonjones/eslint-config": "0.0.53",
-        "@oathompsonjones/ts-config": "0.0.19",
-        "@types/node": "^20.2.1"
+        "@oathompsonjones/eslint-config": "0.0.65",
+        "@oathompsonjones/ts-config": "0.0.25",
+        "@types/node": "^20.8.4"
     },
     "name": "minigames",
     "description": "This repository contains a selection of MiniGames. You can play these games on [my website](https://oathompsonjones.co.uk/arcade).",
     "version": "1.0.0",
     "main": "index.js",
+    "type": "module",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "tsc",
+        "lint": "eslint",
+        "start": "node build/index.js"
     },
     "repository": {
         "type": "git",
