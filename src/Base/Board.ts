@@ -283,13 +283,13 @@ export default abstract class Board<BitBoardType extends BitBoard> {
                 .padStart(4 * this.boardWidth - 1 + Number(wrap) + Number(labelY))
             }\n`
             : "";
-        const topBoarder = wrap
+        const topBorder = wrap
             ? `${labelY ? " " : ""}${GridLines.TopLeft}${GridLines.Horizontal
                 .repeat(this.boardWidth * 3)
                 .match(/.{3}/gu)!
                 .join(GridLines.TTop)}${GridLines.TopRight}\n`
             : "";
-        const bottomBoarder = wrap
+        const bottomBorder = wrap
             ? `${labelY ? " " : ""}${GridLines.BottomLeft}${GridLines.Horizontal
                 .repeat(this.boardWidth * 3)
                 .match(/.{3}/gu)!
@@ -302,8 +302,8 @@ export default abstract class Board<BitBoardType extends BitBoard> {
         const rows = [];
         for (let y = 0; y < this.boardHeight; y++) {
             const yLabel = labelY ? `${y + 1}` : "";
-            const leftBoarder = wrap ? GridLines.Vertical : "";
-            const rightBoarder = wrap ? GridLines.Vertical : "";
+            const leftBorder = wrap ? GridLines.Vertical : "";
+            const rightBorder = wrap ? GridLines.Vertical : "";
             let row = "";
             for (let x = 0; x < this.boardWidth; x++) {
                 const cell = { x, y };
@@ -313,11 +313,11 @@ export default abstract class Board<BitBoardType extends BitBoard> {
                 else
                     row += ` ${symbols[cellOccupier]!} `;
             }
-            rows.push(`${yLabel}${leftBoarder}${row
+            rows.push(`${yLabel}${leftBorder}${row
                 .match(/.{3}/gu)!
-                .join(GridLines.Vertical)}${rightBoarder}\n`);
+                .join(GridLines.Vertical)}${rightBorder}\n`);
         }
-        return `${xLabels}${topBoarder}${rows.join(rowSeparator)}${bottomBoarder}`;
+        return `${xLabels}${topBorder}${rows.join(rowSeparator)}${bottomBorder}`;
     }
 
     /**
