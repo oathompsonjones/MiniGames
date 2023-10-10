@@ -33,7 +33,7 @@ export default class Connect4 extends Base<LongIntBitBoard> {
         let testedInput: RegExpExecArray | null = null;
         do {
             // eslint-disable-next-line no-await-in-loop
-            input = await Console.readLine(`Player ${this.currentPlayer.id + 1}'s move (X): `);
+            input = await Console.readLine(`Player ${this.currentPlayer.id + 1}'s move (A-G): `);
             testedInput = (/^([A-Ga-g])$/u).exec(input);
         } while (testedInput === null);
         return { x: testedInput[0]!.toUpperCase().charCodeAt(0) - 65, y: 0 };

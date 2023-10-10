@@ -33,7 +33,7 @@ export default class TicTacToe extends Base<IntBitBoard> {
         let testedInput: RegExpExecArray | null = null;
         do {
             // eslint-disable-next-line no-await-in-loop
-            input = await Console.readLine(`Player ${this.currentPlayer.id + 1}'s move (XY): `);
+            input = await Console.readLine(`Player ${this.currentPlayer.id + 1}'s move (A-C)(1-3): `);
             testedInput = (/^([A-Ca-c])([1-3])$/u).exec(input);
         } while (testedInput === null);
         return { x: testedInput[1]!.toUpperCase().charCodeAt(0) - 65, y: Number(testedInput[2]) - 1 };
