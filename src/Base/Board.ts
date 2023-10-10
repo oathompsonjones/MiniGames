@@ -269,9 +269,16 @@ export default abstract class Board<BitBoardType extends BitBoard> {
      * @param {boolean} [labelX=true] Whether or not to label x.
      * @param {boolean} [labelY=true] Whether or not to label y.
      * @param {string[]} [symbols=["x", "Y"]] The symbols to use as board pieces.
+     * @param {boolean} [colour=true] Whether or not to colour the pieces.
      * @returns {string} The string representation.
      */
-    public toString(wrap: boolean = true, labelX: boolean = true, labelY: boolean = true, symbols: string[] = ["X", "O"]): string {
+    public toString(
+        wrap: boolean = true,
+        labelX: boolean = true,
+        labelY: boolean = true,
+        symbols: string[] = ["X", "O"],
+        colour: boolean = true
+    ): string {
         const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         const xLabels = labelX
             ? `${alphabet.slice(0, this.boardWidth)
@@ -299,23 +306,26 @@ export default abstract class Board<BitBoardType extends BitBoard> {
             .repeat(this.boardWidth * 3)
             .match(/.{3}/gu)!
             .join(GridLines.Cross)}${wrap ? GridLines.TRight : ""}\n`;
-        const rows = [];
+        const rows: string[] = [];
         for (let y = 0; y < this.boardHeight; y++) {
             const yLabel = labelY ? `${y + 1}` : "";
             const leftBorder = wrap ? GridLines.Vertical : "";
             const rightBorder = wrap ? GridLines.Vertical : "";
-            let row = "";
+            let row = `${yLabel}${leftBorder}`;
             for (let x = 0; x < this.boardWidth; x++) {
                 const cell = { x, y };
+                const bar = x === this.boardWidth - 1 ? "" : GridLines.Vertical;
                 const cellOccupier = this.cellOccupier(cell);
-                if (cellOccupier === null)
-                    row += "   ";
-                else
-                    row += ` ${symbols[cellOccupier]!} `;
+                if (cellOccupier === null) {
+                    row += `   ${bar}`;
+                } else {
+                    row += ` ${colour ? `\x1b[${[91, 93][cellOccupier]!}m` : ""}` +
+                        `${symbols[cellOccupier]!}` +
+                        `${colour ? "\x1b[0m" : ""} ` +
+                        `${bar}`;
+                }
             }
-            rows.push(`${yLabel}${leftBorder}${row
-                .match(/.{3}/gu)!
-                .join(GridLines.Vertical)}${rightBorder}\n`);
+            rows.push(`${row}${rightBorder}\n`);
         }
         return `${xLabels}${topBorder}${rows.join(rowSeparator)}${bottomBorder}`;
     }

@@ -20,7 +20,7 @@ async function readLine(prompt: string = ""): Promise<string> {
  *
  * @param {...unknown[]} text The text to write.
  */
-function writeLine(...text: unknown[]): void {
+function writeLine(...text: string[]): void {
     return console.log(...text);
 }
 
