@@ -1,4 +1,4 @@
-import type { PlayerType, RenderType } from "../../Base/Controller.js";
+import type { Algorithm, PlayerType, RenderType } from "../../Base/Controller.js";
 import Base from "../../Base/Controller.js";
 import Board from "./Board.js";
 import Console from "../../Base/Console.js";
@@ -10,10 +10,10 @@ export default class TicTacToe extends Base<IntBitBoard> {
         super(new Board(), [playerOneType, playerTwoType], renderType);
     }
 
-    public determineCPUMove(difficulty: Omit<PlayerType, "human">): Position {
+    public determineCPUMove(difficulty: Omit<PlayerType, "human">, algorithm: Algorithm = "alphabeta"): Position {
         const { emptyCells } = this.board;
         const randomMove = emptyCells[Math.floor(Math.random() * emptyCells.length)]!;
-        const optimalMove = this.findOptimalMove() ?? randomMove;
+        const optimalMove = this.findOptimalMove({ algorithm }) ?? randomMove;
         switch (difficulty) {
             case "impossibleCPU":
                 return optimalMove;
@@ -59,10 +59,12 @@ export default class TicTacToe extends Base<IntBitBoard> {
         // TODO
     }
 
-    public findOptimalMove(): Position | null {
+    public findOptimalMove({ algorithm }: {
+        algorithm: Algorithm;
+    } = { algorithm: "alphabeta" }): Position | null {
         if (this.board.isEmpty)
             return null;
-        const minimax = this.minimax();
+        const minimax = this[algorithm]();
         return minimax.move;
     }
 }

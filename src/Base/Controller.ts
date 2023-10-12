@@ -4,6 +4,7 @@ import type { Position } from "./Board.js";
 
 export type RenderType = "canvas" | "console";
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
+export type Algorithm = "alphabeta" | "minimax";
 
 /**
  * Represents a game controller.
@@ -88,7 +89,7 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
      * @async
      * @returns {(Promise<number | null>)} The winner.
      */
-    public async play(): Promise<number | null> {
+    public async play(algorithm: Algorithm = "alphabeta"): Promise<number | null> {
         this.render(this.board.winner);
         while (this.board.winner === false) {
             let move: Position;
@@ -96,7 +97,7 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
                 // eslint-disable-next-line no-await-in-loop
                 move = await this.getValidMove();
             } else {
-                move = this.determineCPUMove(this.currentPlayer.playerType);
+                move = this.determineCPUMove(this.currentPlayer.playerType, algorithm);
             }
             this.board.makeMove(move, this.currentPlayer.id);
             this.render(this.board.winner);
@@ -106,22 +107,15 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
     }
 
     /**
-     * The minimax algorithm.
+     * The bog standard minimax algorithm. Left in for reference.
      *
      * @link https://en.wikipedia.org/wiki/Minimax
      * @public
      * @param {number} [depth=Infinity] The depth of the algorithm.
-     * @param {number} [alpha=-Infinity] The bounds for the alpha-beta variation of the algorithm.
-     * @param {number} [beta=Infinity] The bounds for the alpha-beta variation of the algorithm.
      * @param {boolean} [maximisingPlayer=true] Whether or not the current player is the maximising player.
      * @returns {{ move: Position; score: number; }} The optimal move.
      */
-    public minimax(
-        depth: number = Infinity,
-        alpha: number = -Infinity,
-        beta: number = Infinity,
-        maximisingPlayer: boolean = true
-    ): { move: Position; score: number; } {
+    public minimax(depth: number = Infinity, maximisingPlayer: boolean = true): { move: Position; score: number; } {
         const playerIds = [(this.currentPlayerId + 1) % 2, this.currentPlayerId] as const;
         if (depth === 0 || this.board.winner !== false) {
             return {
@@ -136,7 +130,53 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
         const { emptyCells } = this.board;
         for (const move of emptyCells) {
             this.board.makeMove(move, playerIds[Number(maximisingPlayer)]!);
-            const score = (9 - emptyCells.length) * this.minimax(depth - 1, alpha, beta, !maximisingPlayer).score;
+            const score = (9 - emptyCells.length) * this.minimax(depth - 1, !maximisingPlayer).score;
+            this.board.undoLastMove();
+            if (maximisingPlayer) {
+                const bestScore = Math.max(score, bestMove.score);
+                if (bestScore !== bestMove.score)
+                    bestMove = { move, score };
+            } else {
+                const bestScore = Math.min(score, bestMove.score);
+                if (bestScore !== bestMove.score)
+                    bestMove = { move, score };
+            }
+        }
+        return bestMove;
+    }
+
+    /**
+     * The minimax algorithm with alpha-beta pruning.
+     *
+     * @link https://en.wikipedia.org/wiki/Minimax
+     * @public
+     * @param {number} [depth=Infinity] The depth of the algorithm.
+     * @param {number} [alpha=-Infinity] The bounds for the alpha-beta variation of the algorithm.
+     * @param {number} [beta=Infinity] The bounds for the alpha-beta variation of the algorithm.
+     * @param {boolean} [maximisingPlayer=true] Whether or not the current player is the maximising player.
+     * @returns {{ move: Position; score: number; }} The optimal move.
+     */
+    public alphabeta(
+        depth: number = Infinity,
+        alpha: number = -Infinity,
+        beta: number = Infinity,
+        maximisingPlayer: boolean = true
+    ): { move: Position; score: number; } {
+        const playerIds = [(this.currentPlayerId + 1) % 2, this.currentPlayerId] as const;
+        if (depth === 0 || this.board.winner !== false) {
+            return {
+                move: { x: NaN, y: NaN },
+                score: this.board.heuristic * (this.currentPlayerId === 0 ? 1 : -1)
+            };
+        }
+        let bestMove: ReturnType<typeof this.alphabeta> = {
+            move: { x: NaN, y: NaN },
+            score: maximisingPlayer ? -Infinity : Infinity
+        };
+        const { emptyCells } = this.board;
+        for (const move of emptyCells) {
+            this.board.makeMove(move, playerIds[Number(maximisingPlayer)]!);
+            const score = (9 - emptyCells.length) * this.alphabeta(depth - 1, alpha, beta, !maximisingPlayer).score;
             this.board.undoLastMove();
             if (maximisingPlayer) {
                 const bestScore = Math.max(score, bestMove.score);
@@ -257,16 +297,18 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
      * @public
      * @abstract
      * @param {Omit<PlayerType, PlayerType.Human>} difficulty The difficulty of the AI.
+     * @param {Algorithm} algorithm The algorithm to use.
      * @returns {Position} The move.
      */
-    public abstract determineCPUMove(difficulty: Omit<PlayerType, "human">): Position;
+    public abstract determineCPUMove(difficulty: Omit<PlayerType, "human">, algorithm?: Algorithm): Position;
 
     /**
      * Finds the optimal move.
      *
      * @public
      * @abstract
+     * @param {{ algorithm?: Algorithm; maxDepth?: number; }} [options] The options.
      * @returns {(Position | null)} The optimal move.
      */
-    public abstract findOptimalMove(): Position | null;
+    public abstract findOptimalMove(options?: { algorithm?: Algorithm; maxDepth?: number; }): Position | null;
 }

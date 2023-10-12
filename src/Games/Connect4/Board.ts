@@ -20,25 +20,29 @@ export default class Board extends Base<LongIntBitBoard> {
         super(7, 6);
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 6; j++) {
-                this.winningStates.push(new LongIntBitBoard(LongInt.leftShift(this.HORIZONTAL, i + 7 * j)
+                this.winningStates.push(new LongIntBitBoard(LongInt
+                    .leftShift(this.HORIZONTAL, i + 7 * j)
                     .and(this.FULL_BOARD)));
             }
         }
         for (let i = 0; i < 7; i++) {
             for (let j = 0; j < 3; j++) {
-                this.winningStates.push(new LongIntBitBoard(LongInt.leftShift(this.VERTICAL, i + 7 * j)
+                this.winningStates.push(new LongIntBitBoard(LongInt
+                    .leftShift(this.VERTICAL, i + 7 * j)
                     .and(this.FULL_BOARD)));
             }
         }
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 3; j++) {
-                this.winningStates.push(new LongIntBitBoard(LongInt.leftShift(this.LEADING_DIAGONAL, i + 7 * j)
+                this.winningStates.push(new LongIntBitBoard(LongInt
+                    .leftShift(this.LEADING_DIAGONAL, i + 7 * j)
                     .and(this.FULL_BOARD)));
             }
         }
         for (let i = 0; i < 4; i++) {
             for (let j = 0; j < 3; j++) {
-                this.winningStates.push(new LongIntBitBoard(LongInt.leftShift(this.NON_LEADING_DIAGONAL, i + 7 * j)
+                this.winningStates.push(new LongIntBitBoard(LongInt
+                    .leftShift(this.NON_LEADING_DIAGONAL, i + 7 * j)
                     .and(this.FULL_BOARD)));
             }
         }
@@ -47,9 +51,9 @@ export default class Board extends Base<LongIntBitBoard> {
     public get heuristic(): number {
         const { winner } = this;
         if (winner === 0)
-            return Infinity;
+            return 1000;
         if (winner === 1)
-            return -Infinity;
+            return -1000;
         const p0LineOfThreeNoGaps = this.hasLine(0, 3);
         const p1LineOfThreeNoGaps = this.hasLine(1, 3);
         const p0LineOfThreeOneGap = this.hasLine(0, 3, 1);

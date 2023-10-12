@@ -13,7 +13,7 @@ async function input(message: string): Promise<string> {
     return Console.readLine(message);
 }
 
-await (async function main(): Promise<void> {
+async function main(): Promise<void> {
     const start = await input("Would you like to play a game? (Y/N) ");
     if (start.toLowerCase() !== "y")
         process.exit(0);
@@ -72,4 +72,36 @@ await (async function main(): Promise<void> {
     await Console.readLine("");
 
     return main();
-})();
+}
+
+async function testAlgorithms(): Promise<void> {
+    const miniMaxStart = Date.now();
+    for (let i = 0; i < 1000; i++)
+        // eslint-disable-next-line no-await-in-loop
+        await new TicTacToe("console", "impossibleCPU", "impossibleCPU").play("minimax");
+    const miniMaxTime = Date.now() - miniMaxStart;
+
+    const alphaBetaStart = Date.now();
+    for (let i = 0; i < 1000; i++)
+        // eslint-disable-next-line no-await-in-loop
+        await new TicTacToe("console", "impossibleCPU", "impossibleCPU").play("alphabeta");
+    const alphaBetaTime = Date.now() - alphaBetaStart;
+
+    Console.clear();
+    Console.writeLine(`Minimax: ${miniMaxTime}ms`);
+    Console.writeLine(`Alpha-beta: ${alphaBetaTime}ms`);
+    Console.writeLine(`Alpha-beta is ${Math.round(miniMaxTime / alphaBetaTime * 100) / 100}x faster than minimax`);
+}
+
+const mode = await input("What would you like to do?\n1. Play a game\n2. Compare algorithms\n");
+switch (mode) {
+    case "1":
+        await main();
+        break;
+    case "2":
+        await testAlgorithms();
+        break;
+    default:
+        Console.writeLine("Invalid option");
+        break;
+}

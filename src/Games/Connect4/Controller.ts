@@ -1,4 +1,4 @@
-import type { PlayerType, RenderType } from "../../Base/Controller.js";
+import type { Algorithm, PlayerType, RenderType } from "../../Base/Controller.js";
 import Base from "../../Base/Controller.js";
 import Board from "./Board.js";
 import Console from "../../Base/Console.js";
@@ -10,17 +10,16 @@ export default class Connect4 extends Base<LongIntBitBoard> {
         super(new Board(), [playerOneType, playerTwoType], renderType);
     }
 
-    public determineCPUMove(difficulty: Omit<PlayerType, "human">): Position {
+    public determineCPUMove(difficulty: Omit<PlayerType, "human">, algorithm: Algorithm = "alphabeta"): Position {
         const { emptyCells } = this.board;
         const randomMove = emptyCells[Math.floor(Math.random() * emptyCells.length)]!;
-        const optimalMove = (depth: number): Position => this.findOptimalMove(depth);
         switch (difficulty) {
             case "impossibleCPU":
-                return optimalMove(10);
+                return this.findOptimalMove({ algorithm, maxDepth: 10 });
             case "hardCPU":
-                return optimalMove(5);
+                return this.findOptimalMove({ algorithm, maxDepth: 5 });
             case "mediumCPU":
-                return optimalMove(3);
+                return this.findOptimalMove({ algorithm, maxDepth: 3 });
             case "easyCPU":
                 return randomMove;
             default:
@@ -59,10 +58,15 @@ export default class Connect4 extends Base<LongIntBitBoard> {
         // TODO
     }
 
-    public findOptimalMove(depth: number = Infinity): Position {
+    // TODO Sometimes makes illegal move
+    public findOptimalMove(options?: {
+        algorithm?: Algorithm;
+        maxDepth?: number;
+    }): Position {
+        const { maxDepth = Infinity, algorithm = "alphabeta" } = options ?? {};
         if (this.board.isEmpty)
             return { x: 3, y: 5 };
-        const minimax = this.minimax(depth);
+        const minimax = this[algorithm](maxDepth);
         return minimax.move;
     }
 }
