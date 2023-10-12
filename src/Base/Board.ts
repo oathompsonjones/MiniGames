@@ -192,9 +192,8 @@ export default abstract class Board<BitBoardType extends BitBoard> {
         const emptyCells: Position[] = [];
         for (let y = 0; y < this.boardHeight; y++) {
             for (let x = 0; x < this.boardWidth; x++) {
-                const cell = { x, y } as Position;
-                if (this.cellOccupier(cell) === null)
-                    emptyCells.push(cell);
+                if (this.cellOccupier({ x, y }) === null)
+                    emptyCells.push({ x, y });
             }
         }
         return emptyCells;
