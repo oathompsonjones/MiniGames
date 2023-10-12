@@ -279,32 +279,38 @@ export default abstract class Board<BitBoardType extends BitBoard> {
         symbols: string[] = ["X", "O"],
         colour: boolean = true
     ): string {
+        if (symbols.length !== this.numberOfPlayerBoards)
+            throw new Error("Too many symbols.");
+        const symbolLength = symbols[0]!.length;
+        if (symbols.some((s) => s.length !== symbolLength))
+            throw new Error("Symbols must be the same length.");
+        const matchCellSpace = new RegExp(`.{${symbolLength + 2}}`, "gu");
         const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
         const xLabels = labelX
             ? `${alphabet.slice(0, this.boardWidth)
                 .split("")
-                .map((letter) => ` ${letter} `)
+                .map((letter) => ` ${letter.padStart(symbolLength)} `)
                 .join("")
-                .match(/.{3}/gu)!
+                .match(matchCellSpace)!
                 .join(" ")
                 .padStart(4 * this.boardWidth - 1 + Number(wrap) + Number(labelY))
             }\n`
             : "";
         const topBorder = wrap
             ? `${labelY ? " " : ""}${GridLines.TopLeft}${GridLines.Horizontal
-                .repeat(this.boardWidth * 3)
-                .match(/.{3}/gu)!
+                .repeat(this.boardWidth * (symbolLength + 2))
+                .match(matchCellSpace)!
                 .join(GridLines.TTop)}${GridLines.TopRight}\n`
             : "";
         const bottomBorder = wrap
             ? `${labelY ? " " : ""}${GridLines.BottomLeft}${GridLines.Horizontal
-                .repeat(this.boardWidth * 3)
-                .match(/.{3}/gu)!
+                .repeat(this.boardWidth * (symbolLength + 2))
+                .match(matchCellSpace)!
                 .join(GridLines.TBottom)}${GridLines.BottomRight}`
             : "";
         const rowSeparator = `${labelY ? " " : ""}${wrap ? GridLines.TLeft : ""}${GridLines.Horizontal
-            .repeat(this.boardWidth * 3)
-            .match(/.{3}/gu)!
+            .repeat(this.boardWidth * (symbolLength + 2))
+            .match(matchCellSpace)!
             .join(GridLines.Cross)}${wrap ? GridLines.TRight : ""}\n`;
         const rows: string[] = [];
         for (let y = 0; y < this.boardHeight; y++) {
@@ -317,7 +323,7 @@ export default abstract class Board<BitBoardType extends BitBoard> {
                 const bar = x === this.boardWidth - 1 ? "" : GridLines.Vertical;
                 const cellOccupier = this.cellOccupier(cell);
                 if (cellOccupier === null) {
-                    row += `   ${bar}`;
+                    row += ` ${" ".repeat(symbolLength)} ${bar}`;
                 } else {
                     row += ` ${colour ? `\x1b[${[91, 93][cellOccupier]!}m` : ""}` +
                         `${symbols[cellOccupier]!}` +

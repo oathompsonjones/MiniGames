@@ -48,7 +48,7 @@ export default class Connect4 extends Base<LongIntBitBoard> {
 
     public renderToConsole(winner: number | false | null): void {
         Console.clear();
-        Console.writeLine(this.board.toString(true, true, false));
+        Console.writeLine(this.board.toString(true, true, false, ["⬤ ", "⬤ "]));
         if (winner !== false)
             Console.writeLine(winner === null ? "It's a tie!" : `Player ${winner + 1} wins!`);
     }
@@ -58,7 +58,6 @@ export default class Connect4 extends Base<LongIntBitBoard> {
         // TODO
     }
 
-    // TODO Sometimes makes illegal move
     public findOptimalMove(options?: {
         algorithm?: Algorithm;
         maxDepth?: number;
