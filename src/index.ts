@@ -1,107 +1,68 @@
+import type { PlayerType, RenderType } from "./Base/Controller.js";
 import Connect4 from "./Games/Connect4/Controller.js";
 import Console from "./Base/Console.js";
-import type { PlayerType } from "./Base/Controller.js";
+import type Controller from "./Base/Controller.js";
 import TicTacToe from "./Games/TicTacToe/Controller.js";
 
-const games = [
+
+type ControllerConstructor = new (renderType: RenderType, playerOneType: PlayerType, playerTwoType: PlayerType) => Controller;
+const games: ControllerConstructor[] = [
     TicTacToe,
     Connect4
 ];
 
-async function input(message: string): Promise<string> {
-    Console.clear();
-    return Console.readLine(message);
+async function getValidInput<T>(
+    isValid: (value: T | undefined) => boolean,
+    update: (input: string) => T | undefined,
+    ...message: string[]
+): Promise<T> {
+    let output: T | undefined;
+    do {
+        Console.clear();
+        // eslint-disable-next-line no-await-in-loop
+        const inputString = await Console.readLine(message.join("\n"));
+        output = update(inputString);
+    } while (!isValid(output));
+    return output!;
 }
 
 async function main(): Promise<void> {
-    const start = await input("Would you like to play a game? (Y/N) ");
+    Console.clear();
+    const start = await Console.readLine("Would you like to play a game? (Y/N) ");
     if (start.toLowerCase() !== "y")
-        process.exit(0);
+        return;
 
-    let gameChoiceIndex = NaN;
+    const Game: ControllerConstructor = await getValidInput(
+        (value) => value !== undefined,
+        (inputString) => games[parseInt(inputString, 10) - 1],
+        `Select a game (1-${games.length}):`,
+        ...games.map(({ name }, i) => `${i + 1}. ${name}`),
+        ""
+    );
 
-    do {
-        // eslint-disable-next-line no-await-in-loop
-        const selectGame = await input(`Select a game (1-${games.length}):\n${games
-            .map(({ name }, i) => `${i + 1}. ${name}`)
-            .join("\n")}\n`);
-        gameChoiceIndex = parseInt(selectGame, 10) - 1;
-    } while (isNaN(gameChoiceIndex) || gameChoiceIndex < 0 || gameChoiceIndex > games.length - 1);
+    const playerCount: number = await getValidInput(
+        (value) => value !== undefined && value >= 0 && value <= 2,
+        (inputString) => parseInt(inputString, 10),
+        "How many players? (0-2) "
+    );
 
-    let playerCount = NaN;
+    const difficulty: PlayerType | undefined = playerCount === 1 ? await getValidInput(
+        (value) => value !== undefined,
+        (inputString) => (["easyCPU", "mediumCPU", "hardCPU", "impossibleCPU"] as const)[parseInt(inputString, 10) - 1],
+        "Select a difficulty (1-4):",
+        "1. Easy",
+        "2. Medium",
+        "3. Hard",
+        "4. Impossible",
+        ""
+    ) : undefined;
 
-    do {
-        // eslint-disable-next-line no-await-in-loop
-        const selectPlayers = await input("How many players? (0-2) ");
-        playerCount = parseInt(selectPlayers, 10);
-    } while (isNaN(playerCount) || playerCount < 0 || playerCount > 2);
-
-    let difficulty: PlayerType | undefined;
-
-    if (playerCount === 1) {
-        do {
-            // eslint-disable-next-line no-await-in-loop
-            const selectDifficulty = await input([
-                "Select a difficulty (1-4):",
-                "1. Easy",
-                "2. Medium",
-                "3. Hard",
-                "4. Impossible\n"
-            ].join("\n"));
-            difficulty = (["easyCPU", "mediumCPU", "hardCPU", "impossibleCPU"] as const)[parseInt(selectDifficulty, 10) - 1];
-        } while (difficulty === undefined);
-    }
-
-    const Game = games[gameChoiceIndex]!;
     const playerOneType = playerCount > 0 ? "human" : "impossibleCPU";
     const playerTwoType = playerCount > 1 ? "human" : difficulty ?? "impossibleCPU";
 
-    const winners = [];
-    if (playerCount > 0) {
-        await new Game("console", playerOneType, playerTwoType).play();
-    } else {
-        for (let i = 0; i < 1000; i++)
-            winners.push(new Game("console", playerOneType, playerTwoType).play());
-        Console.writeLine(
-            (await Promise.all(winners)).every((winner) => winner === null)
-                ? `${winners.length} ties!`
-                : "Not always a draw"
-        );
-    }
-
+    await new Game("console", playerOneType, playerTwoType).play();
     await Console.readLine("");
 
     return main();
 }
-
-async function testAlgorithms(): Promise<void> {
-    const miniMaxStart = Date.now();
-    for (let i = 0; i < 1000; i++)
-        // eslint-disable-next-line no-await-in-loop
-        await new TicTacToe("console", "impossibleCPU", "impossibleCPU").play("minimax");
-    const miniMaxTime = Date.now() - miniMaxStart;
-
-    const alphaBetaStart = Date.now();
-    for (let i = 0; i < 1000; i++)
-        // eslint-disable-next-line no-await-in-loop
-        await new TicTacToe("console", "impossibleCPU", "impossibleCPU").play("alphabeta");
-    const alphaBetaTime = Date.now() - alphaBetaStart;
-
-    Console.clear();
-    Console.writeLine(`Minimax: ${miniMaxTime}ms`);
-    Console.writeLine(`Alpha-beta: ${alphaBetaTime}ms`);
-    Console.writeLine(`Alpha-beta is ${Math.round(miniMaxTime / alphaBetaTime * 100) / 100}x faster than minimax`);
-}
-
-const mode = await input("What would you like to do?\n1. Play a game\n2. Compare algorithms\n");
-switch (mode) {
-    case "1":
-        await main();
-        break;
-    case "2":
-        await testAlgorithms();
-        break;
-    default:
-        Console.writeLine("Invalid option");
-        break;
-}
+await main();
