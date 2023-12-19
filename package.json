@@ -1,28 +1,25 @@
 {
-    "dependencies": {
-        "@oathompsonjones/eslint-config": "0.0.65",
-        "@oathompsonjones/ts-config": "0.0.25",
-        "@types/node": "^20.8.4"
-    },
     "name": "minigames",
-    "description": "This repository contains a selection of MiniGames. You can play these games on [my website](https://oathompsonjones.co.uk/arcade).",
     "version": "1.0.0",
-    "main": "index.js",
+    "description": "A selection of MiniGames. You will soon be able to play these games on [my website](https://oathompsonjones.co.uk/arcade).",
+    "repository": {
+        "url": "https://github.com/oathompsonjones/MiniGames.git"
+    },
+    "main": "./build/index.js",
+    "types": "./build/index.d.ts",
+    "exports": "./build/index.js",
     "type": "module",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "eslint .",
         "build": "tsc",
-        "lint": "eslint",
-        "start": "node build/index.js"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/oathompsonjones/MiniGames.git"
+        "start": "node ."
     },
     "author": "oathompsonjones",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/oathompsonjones/MiniGames/issues"
-    },
-    "homepage": "https://oathompsonjones.co.uk/arcade"
+    "license": "MIT",
+    "devDependencies": {
+        "@oathompsonjones/eslint-config": "^0.0.72",
+        "@oathompsonjones/ts-config": "^0.0.27",
+        "@types/node": "^20.10.5",
+        "typescript": "^5.3.3"
+    }
 }

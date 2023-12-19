@@ -1,11 +1,10 @@
 {
     "extends": "@oathompsonjones/ts-config",
-    "include": [
-        "src",
-        "src/**/**.test.ts"
-    ],
     "compilerOptions": {
-        "experimentalDecorators": true,
-        "outDir": "build"
-    }
+        "outDir": "build",
+        "rootDir": "src"
+    },
+    "include": [
+        "src/**/*"
+    ]
 }
