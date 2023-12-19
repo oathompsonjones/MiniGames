@@ -1,6 +1,4 @@
-import type BitBoard from "../BitBoard/BitBoard.js";
 import type Board from "./Board.js";
-import type { Game } from "./Game.js";
 import type { Position } from "./Board.js";
 import type View from "./View.js";
 
@@ -10,11 +8,16 @@ export type Algorithm = "alphabeta" | "minimax";
 /**
  * Represents a game controller.
  */
-export default abstract class Controller<T extends BitBoard = BitBoard> implements Game {
+export default abstract class Controller {
+    /**
+     * Contains the ID of the game.
+     */
+    public readonly gameID: string;
+
     /**
      * Contains the board.
      */
-    protected readonly board: Board<T>;
+    public readonly board: Board;
 
     /**
      * Contains the player objects.
@@ -24,7 +27,7 @@ export default abstract class Controller<T extends BitBoard = BitBoard> implemen
     /**
      * Contains the view object.
      */
-    private readonly view: View<T>;
+    private readonly view: View;
 
     /**
      * Contains the ID of the current player.
@@ -34,12 +37,15 @@ export default abstract class Controller<T extends BitBoard = BitBoard> implemen
     /**
      * Creates an instance of Controller.
      *
-     * @param board The board.
      * @param playerTypes The types of player.
      * @param view The view object.
+     * @param gameID The ID of the game.
+     * @param board The board.
      */
-    protected constructor(board: Board<T>, playerTypes: PlayerType[], view: View<T>) {
+    protected constructor(playerTypes: PlayerType[], view: View, gameID: string | undefined, board: Board) {
+        this.gameID = gameID ?? Date.now().toString(16);
         this.board = board;
+        this.board.setGameID(this.gameID);
         this.players = playerTypes.map((playerType, id) => ({ id, playerType }));
         this.view = view;
     }
@@ -57,7 +63,7 @@ export default abstract class Controller<T extends BitBoard = BitBoard> implemen
      * @returns The winner or null in the event of a tie.
      */
     public async play(algorithm: Algorithm = "alphabeta"): Promise<number | null> {
-        this.view.render(this.board);
+        this.view.render(this);
         while (this.board.winner === false) {
             let move: Position;
             if (this.currentPlayer.playerType === "human") {
@@ -67,7 +73,7 @@ export default abstract class Controller<T extends BitBoard = BitBoard> implemen
                 move = this.determineCPUMove(this.currentPlayer.playerType, algorithm);
             }
             this.board.makeMove(move, this.currentPlayer.id);
-            this.view.render(this.board);
+            this.view.render(this);
             this.nextTurn();
         }
         return this.board.winner;
@@ -180,7 +186,7 @@ export default abstract class Controller<T extends BitBoard = BitBoard> implemen
         let move: Position;
         do
             // eslint-disable-next-line no-await-in-loop
-            move = await this.view.getInput(this.currentPlayer);
+            move = await this.view.getInput(this);
         while (!this.board.moveIsValid(move));
         return move;
     }
@@ -200,5 +206,5 @@ export default abstract class Controller<T extends BitBoard = BitBoard> implemen
      * @param options The options.
      * @returns The optimal move.
      */
-    public abstract findOptimalMove(options?: { algorithm?: Algorithm; maxDepth?: number; }): Position | null;
+    public abstract findOptimalMove(options?: { algorithm?: Algorithm; maxDepth?: number; randomMove?: Position; }): Position;
 }

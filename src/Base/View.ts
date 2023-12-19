@@ -1,23 +1,22 @@
-import type BitBoard from "../BitBoard/BitBoard.js";
-import type Board from "./Board.js";
+import type Controller from "./Controller.js";
 import type { Position } from "./Board.js";
 
 /**
  * Represents a game renderer.
  */
-export default interface View<T extends BitBoard> {
+export default interface View {
     /**
      * Renders the game.
      *
-     * @param board The board.
+     * @param controller The game controller.
      */
-    render: (board: Board<T>) => void;
+    render: (controller: Controller) => void;
 
     /**
      * Takes an input from the user.
      *
-     * @param currentPlayer The current player.
+     * @param controller The game controller.
      * @returns The input translated into a position.
      */
-    getInput: (currentPlayer: { id: number; }) => Promise<Position>;
+    getInput: (controller: Controller) => Promise<Position>;
 }

@@ -2,13 +2,12 @@ import type { Algorithm, PlayerType } from "../../Base/Controller.js";
 import Base from "../../Base/Controller.js";
 import Board from "./Board.js";
 import ConsoleView from "./ConsoleView.js";
-import type LongIntBitBoard from "../../BitBoard/LongIntBitBoard.js";
 import type { Position } from "../../Base/Board.js";
 import type View from "../../Base/View.js";
 
-export default class Connect4 extends Base<LongIntBitBoard> {
-    public constructor(playerOneType: PlayerType, playerTwoType: PlayerType, view: View<LongIntBitBoard> = new ConsoleView()) {
-        super(new Board(), [playerOneType, playerTwoType], view);
+export default class Connect4 extends Base {
+    public constructor(playerOneType: PlayerType, playerTwoType: PlayerType, view?: View, id?: string) {
+        super([playerOneType, playerTwoType], view ?? new ConsoleView(), id, new Board());
     }
 
     public determineCPUMove(difficulty: Omit<PlayerType, "human">, algorithm: Algorithm = "alphabeta"): Position {

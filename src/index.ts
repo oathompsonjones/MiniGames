@@ -1,11 +1,11 @@
 import Connect4 from "./Games/Connect4/Controller.js";
 import Console from "./Console.js";
-import type { GameConstructor } from "./Base/Game.js";
+import type Controller from "./Base/Controller.js";
 import type { PlayerType } from "./Base/Controller.js";
 import TicTacToe from "./Games/TicTacToe/Controller.js";
+import type View from "./Base/View.js";
 
-
-const games: GameConstructor[] = [
+const games: Array<new (playerOneType: PlayerType, playerTwoType: PlayerType, view?: View, id?: string) => Controller> = [
     TicTacToe,
     Connect4
 ];
@@ -25,13 +25,13 @@ async function getValidInput<T>(
     return output!;
 }
 
-async function main(): Promise<void> {
+await (async function main(): Promise<void> {
     Console.clear();
     const start = await Console.readLine("Would you like to play a game? (Y/N) ");
     if (start.toLowerCase() !== "y")
         return;
 
-    const Game: GameConstructor = await getValidInput(
+    const Game = await getValidInput<typeof games[number]>(
         (value) => value !== undefined,
         (inputString) => games[parseInt(inputString, 10) - 1],
         `Select a game (1-${games.length}):`,
@@ -63,5 +63,4 @@ async function main(): Promise<void> {
     await Console.readLine("");
 
     return main();
-}
-await main();
+})();
