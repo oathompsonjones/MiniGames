@@ -6,25 +6,25 @@ import type { StringType } from "./LongInt.js";
  *
  * @link https://en.wikipedia.org/wiki/Bitboard
  */
-export default abstract class BitBoard<DataType extends LongInt | number = LongInt | number> {
+export default abstract class BitBoard<T extends LongInt | number = LongInt | number> {
     /**
      * The numeric data.
      */
-    protected _data: DataType;
+    protected _data: T;
 
     /**
      * Creates an instance of BitBoard.
      *
      * @param data The data to assign to the BitBoard.
      */
-    protected constructor(data: DataType) {
+    protected constructor(data: T) {
         this._data = data;
     }
 
     /**
      * Gets the numeric data.
      */
-    public get data(): DataType {
+    public get data(): T {
         return this._data;
     }
 
@@ -106,7 +106,7 @@ export default abstract class BitBoard<DataType extends LongInt | number = LongI
      * @param numberOfBits The number of bits to get.
      * @returns The range of bits.
      */
-    public abstract getBits(LSB: number, numberOfBits: number): DataType;
+    public abstract getBits(LSB: number, numberOfBits: number): T;
 
     /**
      * Carries out a bitwise and (&) operation.
@@ -114,7 +114,7 @@ export default abstract class BitBoard<DataType extends LongInt | number = LongI
      * @param right The right value.
      * @returns The result.
      */
-    public abstract and(right: BitBoard<DataType> | DataType | number): this;
+    public abstract and(right: BitBoard<T> | T | number): this;
 
     /**
      * Carries out a bitwise or (|) operation.
@@ -122,7 +122,7 @@ export default abstract class BitBoard<DataType extends LongInt | number = LongI
      * @param right The right value.
      * @returns The result.
      */
-    public abstract or(right: BitBoard<DataType> | DataType | number): this;
+    public abstract or(right: BitBoard<T> | T | number): this;
 
     /**
      * Carries out a bitwise xor (^) operation.
@@ -130,7 +130,7 @@ export default abstract class BitBoard<DataType extends LongInt | number = LongI
      * @param right The right value.
      * @returns The result.
      */
-    public abstract xor(right: BitBoard<DataType> | DataType | number): this;
+    public abstract xor(right: BitBoard<T> | T | number): this;
 
     /**
      * Carries out a bitwise not (~) operation.
@@ -169,5 +169,5 @@ export default abstract class BitBoard<DataType extends LongInt | number = LongI
      * @param value The value to compare against.
      * @returns Whether or not the two BitBoard have the same data value.
      */
-    public abstract equals(value: BitBoard<DataType> | DataType | number): boolean;
+    public abstract equals(value: BitBoard<T> | T | number): boolean;
 }

@@ -1,12 +1,11 @@
-import type { PlayerType, RenderType } from "./Base/Controller.js";
 import Connect4 from "./Games/Connect4/Controller.js";
-import Console from "./Base/Console.js";
-import type Controller from "./Base/Controller.js";
+import Console from "./Console.js";
+import type { GameConstructor } from "./Base/Game.js";
+import type { PlayerType } from "./Base/Controller.js";
 import TicTacToe from "./Games/TicTacToe/Controller.js";
 
 
-type ControllerConstructor = new (renderType: RenderType, playerOneType: PlayerType, playerTwoType: PlayerType) => Controller;
-const games: ControllerConstructor[] = [
+const games: GameConstructor[] = [
     TicTacToe,
     Connect4
 ];
@@ -32,7 +31,7 @@ async function main(): Promise<void> {
     if (start.toLowerCase() !== "y")
         return;
 
-    const Game: ControllerConstructor = await getValidInput(
+    const Game: GameConstructor = await getValidInput(
         (value) => value !== undefined,
         (inputString) => games[parseInt(inputString, 10) - 1],
         `Select a game (1-${games.length}):`,
@@ -60,7 +59,7 @@ async function main(): Promise<void> {
     const playerOneType = playerCount > 0 ? "human" : "impossibleCPU";
     const playerTwoType = playerCount > 1 ? "human" : difficulty ?? "impossibleCPU";
 
-    await new Game("console", playerOneType, playerTwoType).play();
+    await new Game(playerOneType, playerTwoType).play();
     await Console.readLine("");
 
     return main();

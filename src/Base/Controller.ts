@@ -1,19 +1,20 @@
 import type BitBoard from "../BitBoard/BitBoard.js";
 import type Board from "./Board.js";
+import type { Game } from "./Game.js";
 import type { Position } from "./Board.js";
+import type View from "./View.js";
 
-export type RenderType = "canvas" | "console";
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
 export type Algorithm = "alphabeta" | "minimax";
 
 /**
  * Represents a game controller.
  */
-export default abstract class Controller<BoardType extends BitBoard = BitBoard> {
+export default abstract class Controller<T extends BitBoard = BitBoard> implements Game {
     /**
      * Contains the board.
      */
-    protected readonly board: Board<BoardType>;
+    protected readonly board: Board<T>;
 
     /**
      * Contains the player objects.
@@ -21,9 +22,9 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
     protected readonly players: Array<{ id: number; playerType: PlayerType; }>;
 
     /**
-     * Contains the rendering type.
+     * Contains the view object.
      */
-    private readonly renderType: RenderType;
+    private readonly view: View<T>;
 
     /**
      * Contains the ID of the current player.
@@ -35,12 +36,12 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
      *
      * @param board The board.
      * @param playerTypes The types of player.
-     * @param renderType The rendering type.
+     * @param view The view object.
      */
-    protected constructor(board: Board<BoardType>, playerTypes: PlayerType[], renderType: RenderType) {
+    protected constructor(board: Board<T>, playerTypes: PlayerType[], view: View<T>) {
         this.board = board;
         this.players = playerTypes.map((playerType, id) => ({ id, playerType }));
-        this.renderType = renderType;
+        this.view = view;
     }
 
     /**
@@ -56,7 +57,7 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
      * @returns The winner or null in the event of a tie.
      */
     public async play(algorithm: Algorithm = "alphabeta"): Promise<number | null> {
-        this.render(this.board.winner);
+        this.view.render(this.board);
         while (this.board.winner === false) {
             let move: Position;
             if (this.currentPlayer.playerType === "human") {
@@ -66,7 +67,7 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
                 move = this.determineCPUMove(this.currentPlayer.playerType, algorithm);
             }
             this.board.makeMove(move, this.currentPlayer.id);
-            this.render(this.board.winner);
+            this.view.render(this.board);
             this.nextTurn();
         }
         return this.board.winner;
@@ -171,34 +172,6 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
     }
 
     /**
-     * Renders the game.
-     *
-     * @param winner The output of get winner.
-     */
-    public render(winner: number | false | null): void {
-        switch (this.renderType) {
-            case "console":
-                return this.renderToConsole(winner);
-            case "canvas":
-                return this.renderToCanvas(winner);
-        }
-    }
-
-    /**
-     * Gets the game input.
-     *
-     * @returns The input.
-     */
-    public async getInput(): Promise<Position> {
-        switch (this.renderType) {
-            case "console":
-                return this.getConsoleInput();
-            case "canvas":
-                return this.getCanvasInput();
-        }
-    }
-
-    /**
      * Gets a valid move input.
      *
      * @returns The valid move.
@@ -207,38 +180,10 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
         let move: Position;
         do
             // eslint-disable-next-line no-await-in-loop
-            move = await this.getInput();
+            move = await this.view.getInput(this.currentPlayer);
         while (!this.board.moveIsValid(move));
         return move;
     }
-
-    /**
-     * Gets input from the console.
-     *
-     * @returns The input.
-     */
-    public abstract getConsoleInput(): Promise<Position>;
-
-    /**
-     * Gets input from the canvas.
-     *
-     * @returns The input.
-     */
-    public abstract getCanvasInput(): Promise<Position>;
-
-    /**
-     * Renders to the console.
-     *
-     * @param winner The output of get winner.
-     */
-    public abstract renderToConsole(winner: number | false | null): void;
-
-    /**
-     * Renders to the canvas.
-     *
-     * @param winner The output of get winner.
-     */
-    public abstract renderToCanvas(winner: number | false | null): void;
 
     /**
      * Determines the CPU move.

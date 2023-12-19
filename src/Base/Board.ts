@@ -28,11 +28,11 @@ export const enum GridLines {
 /**
  * Represents a game board.
  */
-export default abstract class Board<BitBoardType extends BitBoard> {
+export default abstract class Board<T extends BitBoard> {
     /**
      * Contains the data stored in a BitBoard.
      */
-    protected readonly bitBoard: BitBoardType;
+    protected readonly bitBoard: T;
 
     /**
      * The width of the board.
@@ -63,7 +63,7 @@ export default abstract class Board<BitBoardType extends BitBoard> {
     /**
      * The board states which represent a winning state.
      */
-    protected abstract readonly winningStates: BitBoardType[];
+    protected abstract readonly winningStates: T[];
 
     /**
      * Creates an instance of Board.
@@ -79,7 +79,7 @@ export default abstract class Board<BitBoardType extends BitBoard> {
         this.numberOfPlayerBoards = playerBoardCount;
         this.numberOfBoards = this.numberOfPlayerBoards + extraBoardCount;
         const totalBits = this.boardWidth * this.boardHeight * this.numberOfBoards;
-        this.bitBoard = (totalBits > 32 ? new LongIntBitBoard(Math.ceil(totalBits / 32)) : new IntBitBoard()) as BitBoardType;
+        this.bitBoard = (totalBits > 32 ? new LongIntBitBoard(Math.ceil(totalBits / 32)) : new IntBitBoard()) as T;
     }
 
     /**
@@ -88,7 +88,7 @@ export default abstract class Board<BitBoardType extends BitBoard> {
     public get isFull(): boolean {
         let isFull = (this.bitBoard instanceof LongIntBitBoard
             ? new LongIntBitBoard(Math.ceil(this.boardWidth * this.boardHeight / 32))
-            : new IntBitBoard()) as BitBoardType;
+            : new IntBitBoard()) as T;
         for (let i = 0; i < this.numberOfPlayerBoards; i++)
             isFull = isFull.or(this.getPlayerBoard(i));
         const fullValue = this.bitBoard instanceof LongIntBitBoard
@@ -106,7 +106,7 @@ export default abstract class Board<BitBoardType extends BitBoard> {
     public get isEmpty(): boolean {
         let isEmpty = (this.bitBoard instanceof LongIntBitBoard
             ? new LongIntBitBoard(Math.ceil(this.boardWidth * this.boardHeight / 32))
-            : new IntBitBoard()) as BitBoardType;
+            : new IntBitBoard()) as T;
         for (let i = 0; i < this.numberOfPlayerBoards; i++)
             isEmpty = isEmpty.or(this.getPlayerBoard(i));
         return isEmpty.equals(0);
@@ -332,7 +332,7 @@ export default abstract class Board<BitBoardType extends BitBoard> {
      * @param playerId The player's ID.
      * @returns The player's bits.
      */
-    protected getPlayerBoard(playerId: number): BitBoardType {
+    protected getPlayerBoard(playerId: number): T {
         const totalBits = (this.bitBoard instanceof LongIntBitBoard ? this.bitBoard.data.wordCount : 1) * 32;
         const boardSize = this.boardWidth * this.boardHeight;
         return this.bitBoard.leftShift(totalBits - boardSize * (playerId + 1)).rightShift(totalBits - boardSize);
