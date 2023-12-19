@@ -1,19 +1,13 @@
 import BitBoard from "./BitBoard.js";
 
 /**
- * A BitBoard which uses just one 32-bit number.
- *
- * @class NumberBitBoard
- * @typedef {IntBitBoard}
- * @extends {BitBoard<number>}
+ * Represents a BitBoard which uses just one 32-bit number.
  */
 export default class IntBitBoard extends BitBoard<number> {
     /**
      * Creates an instance of NumberBitBoard.
      *
-     * @constructor
-     * @public
-     * @param {number} [data=0] The data to fill the BitBoard with.
+     * @param data The data to fill the BitBoard with.
      */
     public constructor(data: number = 0) {
         super(data);

@@ -10,8 +10,6 @@ export interface Position {
 
 /**
  * Defines the characters used to draw a grid.
- *
- * @enum {number}
  */
 export const enum GridLines {
     Horizontal = "\u2500",
@@ -28,87 +26,52 @@ export const enum GridLines {
 }
 
 /**
- * Represent a game board.
- *
- * @abstract
- * @class Board
- * @typedef {Board}
- * @template BitBoardType extends BitBoard
+ * Represents a game board.
  */
 export default abstract class Board<BitBoardType extends BitBoard> {
     /**
      * Contains the data stored in a BitBoard.
-     *
-     * @protected
-     * @readonly
-     * @type {BitBoardType}
      */
     protected readonly bitBoard: BitBoardType;
 
     /**
      * The width of the board.
-     *
-     * @protected
-     * @readonly
-     * @type {number}
+
      */
     protected readonly boardWidth: number;
 
     /**
      * The height of the board.
-     *
-     * @protected
-     * @readonly
-     * @type {number}
      */
     protected readonly boardHeight: number;
 
     /**
      * A stack of moves.
-     *
-     * @protected
-     * @readonly
-     * @type {number[]}
      */
     protected readonly moves: number[] = [];
 
     /**
      * How many boards there are representing player positions (most likely 2).
-     *
-     * @private
-     * @readonly
-     * @type {number}
      */
     private readonly numberOfPlayerBoards: number;
 
     /**
      * Number of boards in total (most likely also 2).
-     *
-     * @private
-     * @readonly
-     * @type {number}
      */
     private readonly numberOfBoards: number;
 
     /**
      * The board states which represent a winning state.
-     *
-     * @protected
-     * @abstract
-     * @readonly
-     * @type {BitBoardType[]}
      */
     protected abstract readonly winningStates: BitBoardType[];
 
     /**
      * Creates an instance of Board.
      *
-     * @constructor
-     * @protected
-     * @param {number} width The width of the board.
-     * @param {number} height The height of the board.
-     * @param {number} playerBoardCount How many boards there are representing player positions (most likely 2).
-     * @param {number} [extraBoardCount=0] Number of extra boards (most likely 0).
+     * @param width The width of the board.
+     * @param height The height of the board.
+     * @param playerBoardCount How many boards there are representing player positions (most likely 2).
+     * @param extraBoardCount Number of extra boards (most likely 0).
      */
     protected constructor(width: number, height: number, playerBoardCount: number = 2, extraBoardCount: number = 0) {
         this.boardWidth = width;
@@ -121,10 +84,6 @@ export default abstract class Board<BitBoardType extends BitBoard> {
 
     /**
      * Calculates whether or not the board is full.
-     *
-     * @public
-     * @readonly
-     * @type {boolean}
      */
     public get isFull(): boolean {
         let isFull = (this.bitBoard instanceof LongIntBitBoard
@@ -143,10 +102,6 @@ export default abstract class Board<BitBoardType extends BitBoard> {
 
     /**
      * Calculates whether or not the board is empty.
-     *
-     * @public
-     * @readonly
-     * @type {boolean}
      */
     public get isEmpty(): boolean {
         let isEmpty = (this.bitBoard instanceof LongIntBitBoard
@@ -162,10 +117,6 @@ export default abstract class Board<BitBoardType extends BitBoard> {
      * If the game is not over, the output is false.
      * If there is a winner, the output is their ID.
      * If there is a draw, the output is null.
-     *
-     * @public
-     * @readonly
-     * @type {(0 | 1 | false | null)}
      */
     public get winner(): 0 | 1 | false | null {
         const playerOneBoard = this.getPlayerBoard(0);
@@ -183,10 +134,6 @@ export default abstract class Board<BitBoardType extends BitBoard> {
 
     /**
      * Calculates which cells are empty.
-     *
-     * @public
-     * @readonly
-     * @type {Position[]}
      */
     public get emptyCells(): Position[] {
         const emptyCells: Position[] = [];
@@ -201,20 +148,14 @@ export default abstract class Board<BitBoardType extends BitBoard> {
 
     /**
      * Calculates the heuristic score for a given board state.
-     *
-     * @public
-     * @abstract
-     * @readonly
-     * @type {number}
      */
     public abstract get heuristic(): number;
 
     /**
      * Makes a move on the board.
      *
-     * @public
-     * @param {Position} move The position of the move.
-     * @param {number} playerId The player who's making the move.
+     * @param move The position of the move.
+     * @param playerId The player who's making the move.
      */
     public makeMove(move: Position, playerId: number): void {
         const bit = this.getBitIndex(move, playerId);
@@ -224,8 +165,6 @@ export default abstract class Board<BitBoardType extends BitBoard> {
 
     /**
      * Reverses the last move.
-     *
-     * @public
      */
     public undoLastMove(): void {
         const lastMove = this.moves.pop();
@@ -237,9 +176,8 @@ export default abstract class Board<BitBoardType extends BitBoard> {
     /**
      * Checks if a move is valid.
      *
-     * @public
-     * @param {Position} move The move.
-     * @returns {boolean} Whether or not it's valid.
+     * @param move The move.
+     * @returns Whether or not it's valid.
      */
     public moveIsValid(move: Position): boolean {
         return this.isValidPosition(move) && this.cellOccupier(move) === null;
@@ -248,9 +186,8 @@ export default abstract class Board<BitBoardType extends BitBoard> {
     /**
      * Checks which player is occupying a given cell.
      *
-     * @public
-     * @param {Position} cell The cell to check.
-     * @returns {(number | null)} If the cell is empty, the output is null, otherwise the output is the player's ID.
+     * @param cell The cell to check.
+     * @returns If the cell is empty, the output is null, otherwise the output is the player's ID.
      */
     public cellOccupier(cell: Position): number | null {
         for (let i = 0; i < this.numberOfPlayerBoards; i++) {
@@ -263,13 +200,12 @@ export default abstract class Board<BitBoardType extends BitBoard> {
     /**
      * Creates a string representation of the board.
      *
-     * @public
-     * @param {boolean} [wrap=true] Whether or not to provide a border for the board.
-     * @param {boolean} [labelX=true] Whether or not to label x.
-     * @param {boolean} [labelY=true] Whether or not to label y.
-     * @param {string[]} [symbols=["x", "Y"]] The symbols to use as board pieces.
-     * @param {boolean} [colour=true] Whether or not to colour the pieces.
-     * @returns {string} The string representation.
+     * @param wrap Whether or not to provide a border for the board.
+     * @param labelX Whether or not to label x.
+     * @param labelY Whether or not to label y.
+     * @param symbols The symbols to use as board pieces.
+     * @param colour Whether or not to colour the pieces.
+     * @returns The string representation.
      */
     public toString(
         wrap: boolean = true,
@@ -325,9 +261,8 @@ export default abstract class Board<BitBoardType extends BitBoard> {
                     row += ` ${" ".repeat(symbolLength)} ${bar}`;
                 } else {
                     row += ` ${colour ? `\x1b[${[91, 93][cellOccupier]!}m` : ""}` +
-                        `${symbols[cellOccupier]!}` +
-                        `${colour ? "\x1b[0m" : ""} ` +
-                        `${bar}`;
+                        `${symbols[cellOccupier]}` +
+                        `${colour ? "\x1b[0m" : ""} ${bar}`;
                 }
             }
             rows.push(`${row}${rightBorder}\n`);
@@ -338,11 +273,10 @@ export default abstract class Board<BitBoardType extends BitBoard> {
     /**
      * Determines if a given player has a line of pieces on the board.
      *
-     * @public
-     * @param {number} playerId The ID of the player.
-     * @param {number} length The number of pieces needed.
-     * @param {number} [maxGaps=0] The number of gaps allowed for a line to be valid. Defaults to 0.
-     * @returns {number} How many lines exist.
+     * @param playerId The ID of the player.
+     * @param length The number of pieces needed.
+     * @param maxGaps The number of gaps allowed for a line to be valid. Defaults to 0.
+     * @returns How many lines exist.
      */
     public hasLine(playerId: number, length: number, maxGaps: number = 0): number {
         if (length > Math.max(this.boardWidth, this.boardHeight))
@@ -382,10 +316,9 @@ export default abstract class Board<BitBoardType extends BitBoard> {
     /**
      * Gets a bit index from its coordinates and player ID.
      *
-     * @protected
-     * @param {Position} move The coordinates.
-     * @param {number} playerId The player ID.
-     * @returns {number} The bit index.
+     * @param move The coordinates.
+     * @param playerId The player ID.
+     * @returns The bit index.
      */
     protected getBitIndex(move: Position, playerId: number): number {
         const moveIndex = this.getIndex(move);
@@ -396,9 +329,8 @@ export default abstract class Board<BitBoardType extends BitBoard> {
     /**
      * A BitBoard containing only the player's bits.
      *
-     * @protected
-     * @param {number} playerId The player's ID.
-     * @returns {BitBoardType} The player's bits.
+     * @param playerId The player's ID.
+     * @returns The player's bits.
      */
     protected getPlayerBoard(playerId: number): BitBoardType {
         const totalBits = (this.bitBoard instanceof LongIntBitBoard ? this.bitBoard.data.wordCount : 1) * 32;
@@ -409,9 +341,8 @@ export default abstract class Board<BitBoardType extends BitBoard> {
     /**
      * Gets a bit index from its coordinates.
      *
-     * @private
-     * @param {Position} move The coordinates.
-     * @returns {number} The bit index.
+     * @param move The coordinates.
+     * @returns The bit index.
      */
     private getIndex(move: Position): number {
         return this.boardWidth * move.y + move.x;
@@ -421,9 +352,8 @@ export default abstract class Board<BitBoardType extends BitBoard> {
      * Checks if a move is valid for the given board.
      * Does not check if that cell is already occupied.
      *
-     * @private
-     * @param {Position} position The position to check.
-     * @returns {boolean} Whether or not that cell exists on the board.
+     * @param position The position to check.
+     * @returns Whether or not that cell exists on the board.
      */
     private isValidPosition(position: Position): boolean {
         return position.x >= 0 && position.x < this.boardWidth && position.y >= 0 && position.y < this.boardHeight;

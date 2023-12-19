@@ -3,59 +3,52 @@ import LongInt from "./LongInt.js";
 
 /**
  * A BitBoard which uses an array of 32-bit numbers.
- *
- * @class LongIntBitBoard
- * @typedef {LongIntBitBoard}
- * @extends {BitBoard<LongInt>}
  */
 export default class LongIntBitBoard extends BitBoard<LongInt> {
     /**
      * Creates an instance of LongIntBitBoard.
      *
-     * @constructor
-     * @public
-     * @param {LongInt} longInt The data to fill the BitBoard with.
+     * @param longInt The data to fill the BitBoard with.
     */
     public constructor(longInt: LongInt);
     /**
      * Creates an instance of LongIntBitBoard.
      *
-     * @constructor
-     * @public
-     * @param {Uint32Array} uint32Array The data to fill the BitBoard with.
+     * @param uint32Array The data to fill the BitBoard with.
      */
     public constructor(uint32Array: Uint32Array);
     /**
      * Creates an instance of LongIntBitBoard.
      *
-     * @constructor
-     * @public
-     * @param {number[]} numberArray The data to fill the BitBoard with.
+     * @param numberArray The data to fill the BitBoard with.
      */
     public constructor(numberArray: number[]);
     /**
      * Creates an instance of LongIntBitBoard.
      *
-     * @constructor
-     * @public
-     * @param {number} [length=2] The length of the LongInt.
+     * @param length The length of the LongInt.
      */
     public constructor(length: number);
     public constructor(args?: LongInt | number[] | Uint32Array | number) {
-        if (args === undefined)
-            super(new LongInt(Array(2).fill(0)));
-        else if (args instanceof LongInt)
-            super(args);
-        else if (args instanceof Uint32Array || args instanceof Array)
-            super(new LongInt(args));
-        else if (typeof args === "number")
-            super(new LongInt(Array(args).fill(0)));
+        switch (true) {
+            case args === undefined:
+                super(new LongInt(Array(2).fill(0)));
+                break;
+            case args instanceof LongInt:
+                super(args);
+                break;
+            case args instanceof Uint32Array || args instanceof Array:
+                super(new LongInt(args));
+                break;
+            case typeof args === "number":
+                super(new LongInt(Array(args).fill(0)));
+                break;
+        }
     }
 
     public getBit(bit: number): 0 | 1 {
         return LongInt.rightShift(this._data, bit).and(1).data[0] as 0 | 1;
     }
-
 
     public setBit(bit: number): void {
         const mask = LongInt.getMatchingLongInt(this._data, 1)

@@ -8,59 +8,34 @@ export type Algorithm = "alphabeta" | "minimax";
 
 /**
  * Represents a game controller.
- *
- * @abstract
- * @class Controller
- * @typedef {Controller}
- * @template BoardType extends BitBoard
  */
 export default abstract class Controller<BoardType extends BitBoard = BitBoard> {
     /**
      * Contains the board.
-     *
-     * @protected
-     * @readonly
-     * @type {Board<BoardType>}
      */
     protected readonly board: Board<BoardType>;
 
     /**
      * Contains the player objects.
-     *
-     * @protected
-     * @readonly
-     * @type {Array<Player<PlayerType>>}
      */
-    protected readonly players: Array<{
-        id: number;
-        playerType: PlayerType;
-    }>;
+    protected readonly players: Array<{ id: number; playerType: PlayerType; }>;
 
     /**
      * Contains the rendering type.
-     *
-     * @private
-     * @readonly
-     * @type {RenderType}
      */
     private readonly renderType: RenderType;
 
     /**
      * Contains the ID of the current player.
-     *
-     * @private
-     * @type {number}
      */
     private currentPlayerId: number = 0;
 
     /**
      * Creates an instance of Controller.
      *
-     * @constructor
-     * @protected
-     * @param {Board<BoardType>} board The board.
-     * @param {PlayerType[]} playerTypes The types of player.
-     * @param {RenderType} renderType The rendering type.
+     * @param board The board.
+     * @param playerTypes The types of player.
+     * @param renderType The rendering type.
      */
     protected constructor(board: Board<BoardType>, playerTypes: PlayerType[], renderType: RenderType) {
         this.board = board;
@@ -70,24 +45,15 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
 
     /**
      * Gets the current player object.
-     *
-     * @public
-     * @readonly
-     * @type {Player<PlayerType>}
      */
-    public get currentPlayer(): {
-        id: number;
-        playerType: PlayerType;
-    } {
+    public get currentPlayer(): { id: number; playerType: PlayerType; } {
         return this.players[this.currentPlayerId]!;
     }
 
     /**
      * Controls the main game flow.
      *
-     * @public
-     * @async
-     * @returns {(Promise<number | null>)} The winner.
+     * @returns The winner or null in the event of a tie.
      */
     public async play(algorithm: Algorithm = "alphabeta"): Promise<number | null> {
         this.render(this.board.winner);
@@ -110,10 +76,9 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
      * The bog standard minimax algorithm. Left in for reference.
      *
      * @link https://en.wikipedia.org/wiki/Minimax
-     * @public
-     * @param {number} [depth=Infinity] The depth of the algorithm.
-     * @param {boolean} [maximisingPlayer=true] Whether or not the current player is the maximising player.
-     * @returns {{ move: Position; score: number; }} The optimal move.
+     * @param depth The depth of the algorithm.
+     * @param maximisingPlayer Whether or not the current player is the maximising player.
+     * @returns The optimal move.
      */
     public minimax(depth: number = Infinity, maximisingPlayer: boolean = true): { move: Position; score: number; } {
         const playerIds = [(this.currentPlayerId + 1) % 2, this.currentPlayerId] as const;
@@ -149,12 +114,11 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
      * The minimax algorithm with alpha-beta pruning.
      *
      * @link https://en.wikipedia.org/wiki/Minimax
-     * @public
-     * @param {number} [depth=Infinity] The depth of the algorithm.
-     * @param {number} [alpha=-Infinity] The bounds for the alpha-beta variation of the algorithm.
-     * @param {number} [beta=Infinity] The bounds for the alpha-beta variation of the algorithm.
-     * @param {boolean} [maximisingPlayer=true] Whether or not the current player is the maximising player.
-     * @returns {{ move: Position; score: number; }} The optimal move.
+     * @param depth The depth of the algorithm.
+     * @param alpha The bounds for the alpha-beta variation of the algorithm.
+     * @param beta The bounds for the alpha-beta variation of the algorithm.
+     * @param maximisingPlayer Whether or not the current player is the maximising player.
+     * @returns The optimal move.
      */
     public alphabeta(
         depth: number = Infinity,
@@ -201,8 +165,6 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
 
     /**
      * Changes which player's turn it is.
-     *
-     * @public
      */
     public nextTurn(): void {
         this.currentPlayerId = (this.currentPlayerId + 1) % this.players.length;
@@ -211,8 +173,7 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
     /**
      * Renders the game.
      *
-     * @public
-     * @param {(number | false | null)} winner The output of get winner.
+     * @param winner The output of get winner.
      */
     public render(winner: number | false | null): void {
         switch (this.renderType) {
@@ -226,9 +187,7 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
     /**
      * Gets the game input.
      *
-     * @public
-     * @async
-     * @returns {Promise<Position>} The input.
+     * @returns The input.
      */
     public async getInput(): Promise<Position> {
         switch (this.renderType) {
@@ -242,9 +201,7 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
     /**
      * Gets a valid move input.
      *
-     * @public
-     * @async
-     * @returns {Promise<Position>} The valid move.
+     * @returns The valid move.
      */
     public async getValidMove(): Promise<Position> {
         let move: Position;
@@ -258,57 +215,45 @@ export default abstract class Controller<BoardType extends BitBoard = BitBoard> 
     /**
      * Gets input from the console.
      *
-     * @public
-     * @abstract
-     * @returns {Promise<Position>} The input.
+     * @returns The input.
      */
     public abstract getConsoleInput(): Promise<Position>;
 
     /**
      * Gets input from the canvas.
      *
-     * @public
-     * @abstract
-     * @returns {Promise<Position>} The input.
+     * @returns The input.
      */
     public abstract getCanvasInput(): Promise<Position>;
 
     /**
      * Renders to the console.
      *
-     * @public
-     * @abstract
-     * @param {(number | false | null)} winner The output of get winner.
+     * @param winner The output of get winner.
      */
     public abstract renderToConsole(winner: number | false | null): void;
 
     /**
      * Renders to the canvas.
      *
-     * @public
-     * @abstract
-     * @param {(number | false | null)} winner The output of get winner.
+     * @param winner The output of get winner.
      */
     public abstract renderToCanvas(winner: number | false | null): void;
 
     /**
      * Determines the CPU move.
      *
-     * @public
-     * @abstract
-     * @param {Omit<PlayerType, PlayerType.Human>} difficulty The difficulty of the AI.
-     * @param {Algorithm} algorithm The algorithm to use.
-     * @returns {Position} The move.
+     * @param difficulty The difficulty of the AI.
+     * @param algorithm The algorithm to use.
+     * @returns The move.
      */
     public abstract determineCPUMove(difficulty: Omit<PlayerType, "human">, algorithm?: Algorithm): Position;
 
     /**
      * Finds the optimal move.
      *
-     * @public
-     * @abstract
-     * @param {{ algorithm?: Algorithm; maxDepth?: number; }} [options] The options.
-     * @returns {(Position | null)} The optimal move.
+     * @param options The options.
+     * @returns The optimal move.
      */
     public abstract findOptimalMove(options?: { algorithm?: Algorithm; maxDepth?: number; }): Position | null;
 }
