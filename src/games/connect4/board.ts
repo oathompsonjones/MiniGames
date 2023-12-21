@@ -1,7 +1,7 @@
-import Base from "../../Base/Board.js";
-import LongInt from "../../BitBoard/LongInt.js";
-import LongIntBitBoard from "../../BitBoard/LongIntBitBoard.js";
-import type { Position } from "../../Base/Board.js";
+import Base from "../../base/board.js";
+import LongInt from "../../bitBoard/longInt.js";
+import LongIntBitBoard from "../../bitBoard/longIntBitBoard.js";
+import type { Position } from "../../base/board.js";
 
 export default class Board extends Base<LongIntBitBoard> {
     protected winningStates: LongIntBitBoard[] = [];

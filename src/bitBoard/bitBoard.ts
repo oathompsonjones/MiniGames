@@ -1,5 +1,5 @@
-import type LongInt from "./LongInt.js";
-import type { StringType } from "./LongInt.js";
+import type LongInt from "./longInt.js";
+import type { StringType } from "./longInt.js";
 
 /**
  * Represents a BitBoard.

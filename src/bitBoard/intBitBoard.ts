@@ -1,4 +1,4 @@
-import BitBoard from "./BitBoard.js";
+import BitBoard from "./bitBoard.js";
 
 /**
  * Represents a BitBoard which uses just one 32-bit number.

@@ -1,5 +1,5 @@
-import Base from "../../Base/Board.js";
-import IntBitBoard from "../../BitBoard/IntBitBoard.js";
+import Base from "../../base/board.js";
+import IntBitBoard from "../../bitBoard/intBitBoard.js";
 
 export default class Board extends Base<IntBitBoard> {
     protected winningStates: IntBitBoard[] = [0x007, 0x038, 0x1C0, 0x049, 0x092, 0x124, 0x111, 0x054]

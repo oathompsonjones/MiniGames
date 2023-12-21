@@ -1,8 +1,8 @@
-import type { GameConstructor, PlayerType } from "./Base/Controller.js";
-import Connect4 from "./Games/Connect4/Controller.js";
+import type { GameConstructor, PlayerType } from "./base/controller.js";
+import Connect4 from "./games/connect4/controller.js";
 import Console from "./Console.js";
-import type { Position } from "./Base/Board.js";
-import TicTacToe from "./Games/TicTacToe/Controller.js";
+import type { Position } from "./base/board.js";
+import TicTacToe from "./games/tictactoe/controller.js";
 
 const games: Array<{
     game: GameConstructor;

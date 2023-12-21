@@ -1,5 +1,5 @@
-import BitBoard from "./BitBoard.js";
-import LongInt from "./LongInt.js";
+import BitBoard from "./bitBoard.js";
+import LongInt from "./longInt.js";
 
 /**
  * A BitBoard which uses an array of 32-bit numbers.

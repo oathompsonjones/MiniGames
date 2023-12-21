@@ -1,6 +1,6 @@
-import type Board from "./Board.js";
+import type Board from "./board.js";
 import { EventEmitter } from "eventemitter3";
-import type { Position } from "./Board.js";
+import type { Position } from "./board.js";
 
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
 export type Algorithm = "alphabeta" | "minimax";

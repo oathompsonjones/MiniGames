@@ -1,7 +1,7 @@
-import type BitBoard from "../BitBoard/BitBoard.js";
-import IntBitBoard from "../BitBoard/IntBitBoard.js";
-import LongInt from "../BitBoard/LongInt.js";
-import LongIntBitBoard from "../BitBoard/LongIntBitBoard.js";
+import type BitBoard from "../bitBoard/bitBoard.js";
+import IntBitBoard from "../bitBoard/intBitBoard.js";
+import LongInt from "../bitBoard/longInt.js";
+import LongIntBitBoard from "../bitBoard/longIntBitBoard.js";
 
 export interface Position {
     y: number;
