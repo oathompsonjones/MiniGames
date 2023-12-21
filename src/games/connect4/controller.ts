@@ -1,7 +1,7 @@
 import type { Algorithm, GameConstructorOptions, PlayerType } from "../../base/controller.js";
 import Base, { Game } from "../../base/controller.js";
 import Board from "./board.js";
-import Console from "../../Console.js";
+import Console from "../../console.js";
 import type { Position } from "../../base/board.js";
 
 function defaultRender(controller: Connect4): void {
