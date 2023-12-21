@@ -6,13 +6,13 @@ export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "me
 export type Algorithm = "alphabeta" | "minimax";
 export interface GameConstructorOptions {
     id?: string;
-    onEnd?: (winner: number | null) => void;
-    onInvalidInput?: () => void;
-    renderer?: Controller["render"];
+    onEnd?: (winner: number | null) => Promise<void> | void;
+    onInvalidInput?: (position: Position) => Promise<void> | void;
+    renderer?: (controller: Controller) => Promise<void> | void;
 }
 export interface GameConstructor {
     // eslint-disable-next-line @typescript-eslint/prefer-function-type
-    new ( playerOneType: PlayerType, playerTwoType: PlayerType, options?: GameConstructorOptions): Controller;
+    new (playerOneType: PlayerType, playerTwoType: PlayerType, options?: GameConstructorOptions): Controller;
 }
 export function Game(constructor: GameConstructor): void {
     void constructor;
@@ -23,9 +23,9 @@ export function Game(constructor: GameConstructor): void {
  * Represents a game controller.
  */
 export default abstract class Controller extends EventEmitter<{
-    end: (winner: number | null) => void;
-    input: (position: Position) => void;
-    invalidInput: () => void;
+    end: GameConstructorOptions["onEnd"];
+    input: GameConstructorOptions["onInvalidInput"];
+    invalidInput: GameConstructorOptions["onInvalidInput"];
 }> {
     /**
      * Contains the ID of the game.
@@ -40,7 +40,7 @@ export default abstract class Controller extends EventEmitter<{
     /**
      * Contains the view object.
      */
-    public readonly render: (controller: this) => Promise<void> | void;
+    public readonly render: Required<GameConstructorOptions>["renderer"];
 
     /**
      * Contains the player objects.
@@ -213,7 +213,7 @@ export default abstract class Controller extends EventEmitter<{
             this.board.makeMove(this.determineCPUMove(this.currentPlayer.playerType, input), this.currentPlayer.id);
         } else {
             if (this.currentPlayer.playerType !== "human" || !this.board.moveIsValid(input))
-                return void this.emit("invalidInput");
+                return void this.emit("invalidInput", input);
             this.board.makeMove(input, this.currentPlayer.id);
         }
         await this.render(this);
