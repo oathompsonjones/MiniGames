@@ -11,7 +11,8 @@
     "type": "module",
     "scripts": {
         "lint": "eslint .",
-        "build": "tsc",
+        "test": "vitest run",
+        "build": "tsc --project tsconfig.build.json",
         "start": "node .",
         "postinstall": "patch-package"
     },
@@ -21,7 +22,8 @@
         "@oathompsonjones/eslint-config": "^0.0.72",
         "@oathompsonjones/ts-config": "^0.0.27",
         "@types/node": "^20.10.5",
-        "typescript": "^5.3.3"
+        "typescript": "^5.3.3",
+        "vitest": "^1.1.0"
     },
     "dependencies": {
         "@milahu/patch-package": "^6.4.14",
