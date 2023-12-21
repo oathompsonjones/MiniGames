@@ -1,14 +1,32 @@
 import type Board from "./Board.js";
+import { EventEmitter } from "eventemitter3";
 import type { Position } from "./Board.js";
-import type View from "./View.js";
 
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
 export type Algorithm = "alphabeta" | "minimax";
+export interface GameConstructorOptions {
+    id?: string;
+    onEnd?: (winner: number | null) => void;
+    onInvalidInput?: () => void;
+    renderer?: Controller["render"];
+}
+export interface GameConstructor {
+    // eslint-disable-next-line @typescript-eslint/prefer-function-type
+    new ( playerOneType: PlayerType, playerTwoType: PlayerType, options?: GameConstructorOptions): Controller;
+}
+export function Game(constructor: GameConstructor): void {
+    void constructor;
+}
+
 
 /**
  * Represents a game controller.
  */
-export default abstract class Controller {
+export default abstract class Controller extends EventEmitter<{
+    end: (winner: number | null) => void;
+    input: (position: Position) => void;
+    invalidInput: () => void;
+}> {
     /**
      * Contains the ID of the game.
      */
@@ -20,14 +38,14 @@ export default abstract class Controller {
     public readonly board: Board;
 
     /**
+     * Contains the view object.
+     */
+    public readonly render: (controller: this) => Promise<void> | void;
+
+    /**
      * Contains the player objects.
      */
     protected readonly players: Array<{ id: number; playerType: PlayerType; }>;
-
-    /**
-     * Contains the view object.
-     */
-    private readonly view: View;
 
     /**
      * Contains the ID of the current player.
@@ -42,12 +60,25 @@ export default abstract class Controller {
      * @param gameID The ID of the game.
      * @param board The board.
      */
-    protected constructor(playerTypes: PlayerType[], view: View, gameID: string | undefined, board: Board) {
+    // eslint-disable-next-line @typescript-eslint/max-params
+    protected constructor(
+        playerTypes: PlayerType[],
+        board: Board,
+        render: Controller["render"],
+        gameID: string | undefined,
+        onEnd?: (winner: number | null) => void,
+        onInvalidInput?: () => void
+    ) {
+        super();
         this.gameID = gameID ?? Date.now().toString(16);
         this.board = board;
         this.board.setGameID(this.gameID);
         this.players = playerTypes.map((playerType, id) => ({ id, playerType }));
-        this.view = view;
+        this.render = render;
+        if (onEnd !== undefined)
+            this.on("end", onEnd);
+        if (onInvalidInput !== undefined)
+            this.on("invalidInput", onInvalidInput);
     }
 
     /**
@@ -62,21 +93,16 @@ export default abstract class Controller {
      *
      * @returns The winner or null in the event of a tie.
      */
-    public async play(algorithm: Algorithm = "alphabeta"): Promise<number | null> {
-        this.view.render(this);
-        while (this.board.winner === false) {
-            let move: Position;
-            if (this.currentPlayer.playerType === "human") {
-                // eslint-disable-next-line no-await-in-loop
-                move = await this.getValidMove();
-            } else {
-                move = this.determineCPUMove(this.currentPlayer.playerType, algorithm);
-            }
-            this.board.makeMove(move, this.currentPlayer.id);
-            this.view.render(this);
-            this.nextTurn();
-        }
-        return this.board.winner;
+    public async play(algorithm: Algorithm = "alphabeta"): Promise<void> {
+        await this.render(this);
+        this.on("input", async (move: Position): Promise<void> => {
+            await this.makeMove(move);
+            if (this.currentPlayer.playerType !== "human")
+                await this.makeMove(algorithm);
+        });
+        while (this.currentPlayer.playerType !== "human" && this.board.winner === false)
+            // eslint-disable-next-line no-await-in-loop
+            await this.makeMove(algorithm);
     }
 
     /**
@@ -87,7 +113,7 @@ export default abstract class Controller {
      * @param maximisingPlayer Whether or not the current player is the maximising player.
      * @returns The optimal move.
      */
-    public minimax(depth: number = Infinity, maximisingPlayer: boolean = true): { move: Position; score: number; } {
+    protected minimax(depth: number = Infinity, maximisingPlayer: boolean = true): { move: Position; score: number; } {
         const playerIds = [(this.currentPlayerId + 1) % 2, this.currentPlayerId] as const;
         if (depth === 0 || this.board.winner !== false) {
             return {
@@ -127,7 +153,7 @@ export default abstract class Controller {
      * @param maximisingPlayer Whether or not the current player is the maximising player.
      * @returns The optimal move.
      */
-    public alphabeta(
+    protected alphabeta(
         depth: number = Infinity,
         alpha: number = -Infinity,
         beta: number = Infinity,
@@ -173,22 +199,28 @@ export default abstract class Controller {
     /**
      * Changes which player's turn it is.
      */
-    public nextTurn(): void {
+    private nextTurn(): void {
         this.currentPlayerId = (this.currentPlayerId + 1) % this.players.length;
     }
 
     /**
-     * Gets a valid move input.
+     * Makes a move.
      *
-     * @returns The valid move.
+     * @param input Either the algorithm to use to calculate the move or the move itself.
      */
-    public async getValidMove(): Promise<Position> {
-        let move: Position;
-        do
-            // eslint-disable-next-line no-await-in-loop
-            move = await this.view.getInput(this);
-        while (!this.board.moveIsValid(move));
-        return move;
+    private async makeMove(input: Algorithm | Position): Promise<void> {
+        if (typeof input === "string") {
+            this.board.makeMove(this.determineCPUMove(this.currentPlayer.playerType, input), this.currentPlayer.id);
+        } else {
+            if (this.currentPlayer.playerType !== "human" || !this.board.moveIsValid(input))
+                return void this.emit("invalidInput");
+            this.board.makeMove(input, this.currentPlayer.id);
+        }
+        await this.render(this);
+        const { winner } = this.board;
+        if (winner !== false)
+            return void this.emit("end", winner);
+        this.nextTurn();
     }
 
     /**
