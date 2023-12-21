@@ -66,8 +66,8 @@ export default abstract class Controller extends EventEmitter<{
         board: Board,
         render: Controller["render"],
         gameID: string | undefined,
-        onEnd?: (winner: number | null) => void,
-        onInvalidInput?: () => void
+        onEnd?: GameConstructorOptions["onEnd"],
+        onInvalidInput?: GameConstructorOptions["onInvalidInput"]
     ) {
         super();
         this.gameID = gameID ?? Date.now().toString(16);
