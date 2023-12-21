@@ -1,2 +1,2 @@
-export * from "./games/tictactoe/controller.js";
-export * from "./games/connect4/controller.js";
+export { default as TicTacToe } from "./games/tictactoe/controller.js";
+export { default as Connect4 } from "./games/connect4/controller.js";
