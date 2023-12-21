@@ -5,4 +5,5 @@ jest.config.js
 tsconfig.json
 pnpm-lock.yaml
 docs
-src/player.ts
+build/player.js
+build/player.d.ts
