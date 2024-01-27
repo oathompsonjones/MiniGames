@@ -1,0 +1,36 @@
+name: publish
+
+on:
+  workflow_run:
+    workflows: ["lint-and-test"]
+    branches: [main, master]
+    types: 
+      - completed
+
+jobs:
+  publish:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+        node: [14.x]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+          registry-url: 'https://registry.npmjs.org'
+          cache: "pnpm"
+      - name: Install dependencies
+        run: pnpm install
+      - name: Build code
+        run: pnpm build
+      - name: Publish code
+        run: pnpm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_REGISTRY_KEY }}

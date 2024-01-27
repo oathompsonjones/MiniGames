@@ -3,6 +3,7 @@ import LongInt from "../../bitBoard/longInt.js";
 import LongIntBitBoard from "../../bitBoard/longIntBitBoard.js";
 import type { Position } from "../../base/board.js";
 
+/** Represents a Connect 4 board. */
 export default class Board extends Base<LongIntBitBoard> {
     protected winningStates: LongIntBitBoard[] = [];
 
@@ -16,6 +17,7 @@ export default class Board extends Base<LongIntBitBoard> {
 
     private readonly NON_LEADING_DIAGONAL = new LongInt([0b0000_0000001_0000010_0000100_0001000, 0b0000000_000]);
 
+    /** Creates an instance of Board. */
     public constructor() {
         super(7, 6);
         for (let i = 0; i < 4; i++) {
@@ -48,12 +50,16 @@ export default class Board extends Base<LongIntBitBoard> {
         }
     }
 
+    /** Calculates the heuristic score for the current board state. */
     public get heuristic(): number {
         const { winner } = this;
+
         if (winner === 0)
             return 1000;
+
         if (winner === 1)
             return -1000;
+
         const p0LineOfThreeNoGaps = this.hasLine(0, 3);
         const p1LineOfThreeNoGaps = this.hasLine(1, 3);
         const p0LineOfThreeOneGap = this.hasLine(0, 3, 1);
@@ -72,21 +78,32 @@ export default class Board extends Base<LongIntBitBoard> {
         const p1LineOfTwoScore = 3 * p1LineOfTwoNoGaps + 2 * p1LineOfTwoOneGap + p1LineOfTwoTwoGaps;
         const p0Score = 10 * p0LineOfThreeScore + p0LineOfTwoScore;
         const p1Score = 10 * p1LineOfThreeScore + p1LineOfTwoScore;
+
         return p0Score - p1Score;
     }
 
+    /** Generates a list of empty cells. */
     public override get emptyCells(): Position[] {
         const emptyCells: Position[] = [];
+
         for (let x = 0; x < this.boardWidth; x++) {
             const cell: Position = { x, y: 0 };
+
             if (this.cellOccupier(cell) === null)
                 emptyCells.push(cell);
         }
+
         return emptyCells;
     }
 
+    /**
+     * Makes a move on the board.
+     * @param move The move to make.
+     * @param playerId The player making the move.
+     */
     public override makeMove(move: Position, playerId: number): void {
         const updatedMove = move;
+
         for (let i = 5; i >= 0; i--) {
             if (this.cellOccupier({ x: move.x, y: i }) === null) {
                 move.y = i;

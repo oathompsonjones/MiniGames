@@ -10,24 +10,23 @@ import readline from "readline/promises";
 async function readLine(prompt: string = ""): Promise<string> {
     const reader = readline.createInterface(process.stdin, process.stdout);
     const input = await reader.question(prompt);
+
     reader.close();
+
     return input;
 }
 
 /**
  * Writes to the console.
- *
  * @param text The text to write.
  */
 function writeLine(...text: string[]): void {
-    return console.log(...text);
+    console.log(...text);
 }
 
-/**
- * Clears the console.
- */
+/** Clears the console. */
 function clear(): void {
-    return console.clear();
+    console.clear();
 }
 
 export default { clear, readLine, writeLine };
