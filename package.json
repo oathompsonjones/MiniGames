@@ -1,6 +1,6 @@
 {
     "name": "@oathompsonjones/mini-games",
-    "version": "1.0.3",
+    "version": "1.0.4",
     "description": "A selection of MiniGames. You will soon be able to play these games on [my website](https://oathompsonjones.co.uk/arcade).",
     "repository": {
         "url": "https://github.com/oathompsonjones/MiniGames.git"
@@ -27,5 +27,10 @@
     },
     "dependencies": {
         "eventemitter3": "^5.0.1"
+    },
+    "pnpm": {
+        "patchedDependencies": {
+            "eventemitter3@5.0.1": "patches/eventemitter3@5.0.1.patch"
+        }
     }
 }

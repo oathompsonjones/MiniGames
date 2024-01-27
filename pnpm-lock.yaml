@@ -4,10 +4,15 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  eventemitter3@5.0.1:
+    hash: saqitqhhdcmq6arqf7udvooo3q
+    path: patches/eventemitter3@5.0.1.patch
+
 dependencies:
   eventemitter3:
     specifier: ^5.0.1
-    version: 5.0.1
+    version: 5.0.1(patch_hash=saqitqhhdcmq6arqf7udvooo3q)
 
 devDependencies:
   '@oathompsonjones/eslint-config':
@@ -1488,9 +1493,10 @@ packages:
     engines: {node: '>=0.10.0'}
     dev: true
 
-  /eventemitter3@5.0.1:
+  /eventemitter3@5.0.1(patch_hash=saqitqhhdcmq6arqf7udvooo3q):
     resolution: {integrity: sha512-GWkBvjiSZK87ELrYOSESUYeVIc9mvLLf/nXalMOS5dYrgZq9o5OVkbZAVM06CVxYsCwH9BDZFPlQTlPA1j4ahA==}
     dev: false
+    patched: true
 
   /execa@8.0.1:
     resolution: {integrity: sha512-VyhnebXciFV2DESc+p6B+y0LjSm0krU4OgJN44qFAhBY0TJ+1V61tYD2+wHusZ6F9n5K+vl8k0sTy7PEfV4qpg==}
