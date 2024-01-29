@@ -5,7 +5,7 @@ import type { Position } from "./board.js";
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
 export type Algorithm = "alphabeta" | "minimax";
 export type GameConstructorOptions = {
-    id?: string;
+    id?: unknown;
     onEnd?: (winner: number | null) => Promise<void> | void;
     onInvalidInput?: (position: Position) => Promise<void> | void;
     renderer?: (controller: Controller) => Promise<void> | void;
