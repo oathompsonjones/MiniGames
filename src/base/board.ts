@@ -26,7 +26,7 @@ export const enum GridLines {
 /** Represents a game board. */
 export default abstract class Board<T extends BitBoard = BitBoard> {
     /** Contains the ID of the game. */
-    public gameID: string = "";
+    public gameID: unknown = "";
 
     /** Contains the data stored in a BitBoard. */
     protected readonly bitBoard: T;
@@ -141,7 +141,7 @@ export default abstract class Board<T extends BitBoard = BitBoard> {
      * Sets the game ID.
      * @param id The ID of the game.
      */
-    public setGameID(id: string): void {
+    public setGameID(id: unknown): void {
         this.gameID = id;
     }
 

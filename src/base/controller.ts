@@ -29,7 +29,7 @@ export default abstract class Controller extends EventEmitter<{
     invalidInput: GameConstructorOptions["onInvalidInput"];
 }> {
     /** Contains the ID of the game. */
-    public readonly gameID: string;
+    public readonly gameID: unknown;
 
     /** Contains the board. */
     public readonly board: Board;
@@ -55,7 +55,7 @@ export default abstract class Controller extends EventEmitter<{
         playerTypes: PlayerType[],
         board: Board,
         render: Controller["render"],
-        gameID: string | undefined,
+        gameID: unknown,
         onEnd?: GameConstructorOptions["onEnd"],
         onInvalidInput?: GameConstructorOptions["onInvalidInput"],
     ) {
