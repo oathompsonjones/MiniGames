@@ -25,9 +25,6 @@ export const enum GridLines {
 
 /** Represents a game board. */
 export default abstract class Board<T extends BitBoard = BitBoard> {
-    /** Contains the ID of the game. */
-    public gameID: unknown = "";
-
     /** Contains the data stored in a BitBoard. */
     protected readonly bitBoard: T;
 
@@ -136,14 +133,6 @@ export default abstract class Board<T extends BitBoard = BitBoard> {
 
     /** Calculates the heuristic score for a given board state. */
     public abstract get heuristic(): number;
-
-    /**
-     * Sets the game ID.
-     * @param id The ID of the game.
-     */
-    public setGameID(id: unknown): void {
-        this.gameID = id;
-    }
 
     /**
      * Makes a move on the board.

@@ -8,7 +8,7 @@ import type { Position } from "../../base/board.js";
  * The default rendering function for TicTacToe.
  * @param controller The controller to render.
  */
-function defaultRender(controller: TicTacToe): void {
+function defaultRender<T>(controller: TicTacToe<T>): void {
     Console.clear();
     Console.writeLine(controller.board.toString(false));
     const { winner } = controller.board;
@@ -19,21 +19,21 @@ function defaultRender(controller: TicTacToe): void {
 
 @Game
 /** A game of TicTacToe. */
-export default class TicTacToe extends Base {
+export default class TicTacToe<T> extends Base<T> {
     /**
      * Creates a new TicTacToe game.
      * @param playerOneType The type of player one.
      * @param playerTwoType The type of player two.
      * @param options The options for the game.
      */
-    public constructor(playerOneType: PlayerType, playerTwoType: PlayerType, options?: GameConstructorOptions) {
+    public constructor(playerOneType: PlayerType, playerTwoType: PlayerType, options: GameConstructorOptions<T>) {
         super(
             [playerOneType, playerTwoType],
             new Board(),
-            options?.renderer ?? defaultRender,
-            options?.id,
-            options?.onEnd,
-            options?.onInvalidInput,
+            options.renderer ?? defaultRender,
+            options.id,
+            options.onEnd,
+            options.onInvalidInput,
         );
     }
 

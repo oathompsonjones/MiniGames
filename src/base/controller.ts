@@ -4,38 +4,38 @@ import type { Position } from "./board.js";
 
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
 export type Algorithm = "alphabeta" | "minimax";
-export type GameConstructorOptions = {
-    id?: unknown;
+export type GameConstructorOptions<T> = {
+    id: T;
     onEnd?: (winner: number | null) => Promise<void> | void;
     onInvalidInput?: (position: Position) => Promise<void> | void;
-    renderer?: (controller: Controller) => Promise<void> | void;
+    renderer?: (controller: Controller<T>) => Promise<void> | void;
 };
-export type GameConstructor = {
+export type GameConstructor<T> = {
     // eslint-disable-next-line @typescript-eslint/prefer-function-type
-    new (playerOneType: PlayerType, playerTwoType: PlayerType, options?: GameConstructorOptions): Controller;
+    new (playerOneType: PlayerType, playerTwoType: PlayerType, options: GameConstructorOptions<T>): Controller<T>;
 };
 /**
  * Decorator to check that the constructor type for the given class is correct.
  * @param constructor The class to check.
  */
-export function Game(constructor: GameConstructor): void {
+export function Game<T>(constructor: GameConstructor<T>): void {
     void constructor;
 }
 
 /** Represents a game controller. */
-export default abstract class Controller extends EventEmitter<{
-    end: GameConstructorOptions["onEnd"];
-    input: GameConstructorOptions["onInvalidInput"];
-    invalidInput: GameConstructorOptions["onInvalidInput"];
+export default abstract class Controller<T> extends EventEmitter<{
+    end: GameConstructorOptions<T>["onEnd"];
+    input: GameConstructorOptions<T>["onInvalidInput"];
+    invalidInput: GameConstructorOptions<T>["onInvalidInput"];
 }> {
     /** Contains the ID of the game. */
-    public readonly gameID: unknown;
+    public readonly gameID: T;
 
     /** Contains the board. */
     public readonly board: Board;
 
     /** Contains the view object. */
-    public readonly render: Required<GameConstructorOptions>["renderer"];
+    public readonly render: Required<GameConstructorOptions<T>>["renderer"];
 
     /** Contains the player objects. */
     protected readonly players: Array<{ id: number; playerType: PlayerType; }>;
@@ -54,15 +54,14 @@ export default abstract class Controller extends EventEmitter<{
     protected constructor(
         playerTypes: PlayerType[],
         board: Board,
-        render: Controller["render"],
-        gameID: unknown,
-        onEnd?: GameConstructorOptions["onEnd"],
-        onInvalidInput?: GameConstructorOptions["onInvalidInput"],
+        render: Controller<T>["render"],
+        gameID: T,
+        onEnd?: GameConstructorOptions<T>["onEnd"],
+        onInvalidInput?: GameConstructorOptions<T>["onInvalidInput"],
     ) {
         super();
-        this.gameID = gameID ?? Date.now().toString(16);
+        this.gameID = gameID;
         this.board = board;
-        this.board.setGameID(this.gameID);
         this.players = playerTypes.map((playerType, id) => ({ id, playerType }));
         this.render = render;
 

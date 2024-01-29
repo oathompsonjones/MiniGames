@@ -5,7 +5,7 @@ import type { Position } from "./base/board.js";
 import TicTacToe from "./games/tictactoe/controller.js";
 
 const games: Array<{
-    Game: GameConstructor;
+    Game: GameConstructor<string>;
     inputPrompt: string;
     inputValidator: RegExp;
     moveDimensions?: number;
@@ -141,7 +141,7 @@ await (async function main(): Promise<void> {
     const playerTwoType = playerCount > 1 ? "human" : difficulty ?? "impossibleCPU";
 
     let gameOver = false;
-    const game = new gameObject.Game(playerOneType, playerTwoType);
+    const game = new gameObject.Game(playerOneType, playerTwoType, { id: Date.now().toString(16) });
 
     game.on("end", () => (gameOver = true));
     await game.play();
