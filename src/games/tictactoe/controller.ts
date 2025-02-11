@@ -6,7 +6,8 @@ import type { Position } from "../../base/board.js";
 
 /**
  * The default rendering function for TicTacToe.
- * @param controller The controller to render.
+ * @template T - The type of the game ID.
+ * @param controller - The controller to render.
  */
 function defaultRender<T>(controller: TicTacToe<T>): void {
     Console.clear();
@@ -17,14 +18,17 @@ function defaultRender<T>(controller: TicTacToe<T>): void {
         Console.writeLine(winner === null ? "It's a tie!" : `Player ${winner + 1} wins!`);
 }
 
+/**
+ * A game of TicTacToe.
+ * @template T - The type of the game ID.
+ */
 @Game
-/** A game of TicTacToe. */
 export default class TicTacToe<T> extends Base<T> {
     /**
      * Creates a new TicTacToe game.
-     * @param playerOneType The type of player one.
-     * @param playerTwoType The type of player two.
-     * @param options The options for the game.
+     * @param playerOneType - The type of player one (human or CPU).
+     * @param playerTwoType - The type of player two (human or CPU).
+     * @param options - The options for the game.
      */
     public constructor(playerOneType: PlayerType, playerTwoType: PlayerType, options: GameConstructorOptions<T>) {
         super(
@@ -39,9 +43,10 @@ export default class TicTacToe<T> extends Base<T> {
 
     /**
      * Calculates the CPU's move.
-     * @param difficulty The difficulty of the CPU.
-     * @param algorithm The algorithm to use.
+     * @param difficulty - The difficulty of the CPU.
+     * @param algorithm - The algorithm to use.
      * @returns The CPU's move.
+     * @throws {Error} An error if the difficulty is invalid.
      */
     public determineCPUMove(difficulty: Omit<PlayerType, "human">, algorithm: Algorithm = "alphabeta"): Position {
         const { emptyCells } = this.board;
@@ -64,10 +69,11 @@ export default class TicTacToe<T> extends Base<T> {
 
     /**
      * Finds the optimal move for the current player.
-     * @param algorithm The algorithm to use.
-     * @param maxDepth The maximum depth to search.
-     * @param randomMove The move to return if the board is empty.
-     * @returns The optimal move.
+     * @param algorithm - The algorithm to use.
+     * @param algorithm.algorithm - The algorithm to use.
+     * @param algorithm.randomMove - The move to return if the board is empty.
+     * @returns The optimal move for the current player.
+     * @throws {Error} An error if the algorithm is invalid.
      */
     public findOptimalMove({ algorithm, randomMove }: {
         algorithm: Algorithm;

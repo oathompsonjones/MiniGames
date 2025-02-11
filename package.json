@@ -1,6 +1,6 @@
 {
     "name": "@oathompsonjones/mini-games",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "A selection of MiniGames. You will soon be able to play these games on [my website](https://oathompsonjones.co.uk/arcade).",
     "repository": {
         "url": "https://github.com/oathompsonjones/MiniGames.git"
@@ -19,11 +19,11 @@
     "author": "oathompsonjones",
     "license": "MIT",
     "devDependencies": {
-        "@oathompsonjones/eslint-config": "^1.0.10",
-        "@oathompsonjones/ts-config": "^0.0.31",
-        "@types/node": "^20.11.10",
-        "typescript": "^5.3.3",
-        "vitest": "^1.2.2"
+        "@oathompsonjones/eslint-config": "^1.5.5",
+        "@oathompsonjones/ts-config": "^0.0.35",
+        "@types/node": "^22.13.1",
+        "typescript": "^5.7.3",
+        "vitest": "^3.0.5"
     },
     "dependencies": {
         "eventemitter3": "^5.0.1"
@@ -32,5 +32,6 @@
         "patchedDependencies": {
             "eventemitter3@5.0.1": "patches/eventemitter3@5.0.1.patch"
         }
-    }
+    },
+    "packageManager": "pnpm@9.11.0+sha512.0a203ffaed5a3f63242cd064c8fb5892366c103e328079318f78062f24ea8c9d50bc6a47aa3567cabefd824d170e78fa2745ed1f16b132e16436146b7688f19b"
 }

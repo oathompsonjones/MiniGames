@@ -1,4 +1,8 @@
-export type StringType = 2 | 10 | 16;
+export const enum StringType {
+    BINARY = 2,
+    DECIMAL = 10,
+    HEXADECIMAL = 16,
+}
 
 /**
  * Represents a long integer using an array of 32-bit numbers.
@@ -11,22 +15,22 @@ export default class LongInt {
 
     /**
      * Creates an instance of LongInt.
-     * @param values A little-endian array of 32-bit numbers to fill the `LongInt`.
+     * @param values - A little-endian array of 32-bit numbers to fill the `LongInt`.
      */
     public constructor(values: number[] | Uint32Array);
     /**
      * Creates an instance of LongInt.
-     * @param length The number of 32-bit numbers to construct the `LongInt` out of.
+     * @param length - The number of 32-bit numbers to construct the `LongInt` out of.
      */
     public constructor(length: number);
     /**
      * Creates an instance of LongInt.
-     * @param longInt A `LongInt` object to duplicate.
+     * @param longInt - A `LongInt` object to duplicate.
      */
     public constructor(longInt: LongInt);
     /**
      * Creates an instance of LongInt.
-     * @param args The arguments to construct the `LongInt` out of.
+     * @param args - The arguments to construct the `LongInt` out of.
      */
     public constructor(args: LongInt | number[] | Uint32Array | number) {
         if (args instanceof Array || args instanceof Uint32Array)
@@ -37,15 +41,18 @@ export default class LongInt {
             this.data = new Uint32Array(args).fill(0);
     }
 
-    /** Gets the number of 32-bit words which make the LongInt. */
+    /**
+     * Gets the number of 32-bit words which make the LongInt.
+     * @returns The number of words.
+     */
     public get wordCount(): number {
         return this.data.length;
     }
 
     /**
      * Carries out a bitwise and (&) operation on the two numbers.
-     * @param left The left number.
-     * @param right The right number.
+     * @param left - The left number.
+     * @param right - The right number.
      * @returns The result of left & right.
      */
     public static and(left: LongInt, right: LongInt | number): LongInt {
@@ -54,8 +61,8 @@ export default class LongInt {
 
     /**
      * Carries out a bitwise or (|) operation on the two numbers.
-     * @param left The left number.
-     * @param right The right number.
+     * @param left - The left number.
+     * @param right - The right number.
      * @returns The result of left | right.
      */
     public static or(left: LongInt, right: LongInt | number): LongInt {
@@ -64,8 +71,8 @@ export default class LongInt {
 
     /**
      * Carries out a bitwise xor (^) operation on the two numbers.
-     * @param left The left number.
-     * @param right The right number.
+     * @param left - The left number.
+     * @param right - The right number.
      * @returns The result of left ^ right.
      */
     public static xor(left: LongInt, right: LongInt | number): LongInt {
@@ -74,7 +81,7 @@ export default class LongInt {
 
     /**
      * Carries out a bitwise not (~) operation on the number.
-     * @param number The number to negate.
+     * @param number - The number to negate.
      * @returns The result of ~number.
      */
     public static not(number: LongInt): LongInt {
@@ -83,8 +90,8 @@ export default class LongInt {
 
     /**
      * Carries out a bitwise left shift (<<) operation on the number.
-     * @param number The number to shift.
-     * @param shiftAmount The number of places to shift.
+     * @param number - The number to shift.
+     * @param shiftAmount - The number of places to shift.
      * @returns The result of number << shiftAmount.
      */
     public static leftShift(number: LongInt, shiftAmount: number): LongInt {
@@ -93,8 +100,8 @@ export default class LongInt {
 
     /**
      * Carries out a bitwise unsigned right shift (>>>) operation on the number.
-     * @param number The number to shift.
-     * @param shiftAmount The number of places to shift.
+     * @param number - The number to shift.
+     * @param shiftAmount - The number of places to shift.
      * @returns The result of number >>> shiftAmount.
      */
     public static rightShift(number: LongInt, shiftAmount: number): LongInt {
@@ -103,8 +110,8 @@ export default class LongInt {
 
     /**
      * Carries out a bitwise arithmetic right shift (>>) operation on the number.
-     * @param number The number to shift.
-     * @param shiftAmount The number of places to shift.
+     * @param number - The number to shift.
+     * @param shiftAmount - The number of places to shift.
      * @returns The result of number >> shiftAmount.
      */
     public static arithmeticRightShift(number: LongInt, shiftAmount: number): LongInt {
@@ -113,8 +120,8 @@ export default class LongInt {
 
     /**
      * Determines whether or not 2 LongInts have equal values.
-     * @param longInt1 The first LongInt.
-     * @param longInt2 The second LongInt (can also be a number).
+     * @param longInt1 - The first LongInt.
+     * @param longInt2 - The second LongInt (can also be a number).
      * @returns Whether or not they are equal.
      */
     public static equals(longInt1: LongInt, longInt2: LongInt | number): boolean {
@@ -123,29 +130,29 @@ export default class LongInt {
 
     /**
      * Creates a new LongInt object with the given value, stretched or truncated to the same size as this.
-     * @param longInt The LongInt to match the dimensions of.
-     * @param value The LongInt object to use as the value.
+     * @param longInt - The LongInt to match the dimensions of.
+     * @param value - The LongInt object to use as the value.
      * @returns The new LongInt.
      */
     public static getMatchingLongInt(longInt: LongInt, value: LongInt): LongInt;
     /**
      * Creates a new LongInt object using the given value, stretched or truncated to the same size as this.
-     * @param longInt The LongInt to match the dimensions of.
-     * @param values An array of 32-bit numbers to use as the value.
+     * @param longInt - The LongInt to match the dimensions of.
+     * @param values - An array of 32-bit numbers to use as the value.
      * @returns The new LongInt.
      */
     public static getMatchingLongInt(longInt: LongInt, values: number[] | Uint32Array): LongInt;
     /**
      * Creates a new LongInt object using the given value, stretched or truncated to the same size as this.
-     * @param longInt The LongInt to match the dimensions of.
-     * @param value A 32-bit number to use as the value.
+     * @param longInt - The LongInt to match the dimensions of.
+     * @param value - A 32-bit number to use as the value.
      * @returns The new LongInt.
      */
     public static getMatchingLongInt(longInt: LongInt, value?: number): LongInt;
     /**
      * Creates a LongInt with the same dimensions as this one, using the given input.
-     * @param longInt The LongInt to match the dimensions of.
-     * @param value The value of the LongInt.
+     * @param longInt - The LongInt to match the dimensions of.
+     * @param value - The value of the LongInt to create.
      * @returns The new LongInt.
      */
     public static getMatchingLongInt(longInt: LongInt, value: LongInt | number[] | Uint32Array | number = 0): LongInt {
@@ -154,42 +161,42 @@ export default class LongInt {
 
     /**
      * Carries out an in-place bitwise and (&) operation on this number and the one provided.
-     * @param right The right number.
+     * @param right - The right number.
      * @returns The new value of this & right.
      */
     public and(right: LongInt | number): this {
         const rightLongInt = this.getMatchingLongInt(right);
 
         for (let i = 0; i < this.data.length; i++)
-            this.data[i] &= rightLongInt.data[i]!;
+            this.data[i]! &= rightLongInt.data[i]!;
 
         return this;
     }
 
     /**
      * Carries out an in-place bitwise or (|) operation on this number and the one provided.
-     * @param right The right number.
+     * @param right - The right number.
      * @returns The new value of this | right.
      */
     public or(right: LongInt | number): this {
         const rightLongInt = this.getMatchingLongInt(right);
 
         for (let i = 0; i < this.data.length; i++)
-            this.data[i] |= rightLongInt.data[i]!;
+            this.data[i]! |= rightLongInt.data[i]!;
 
         return this;
     }
 
     /**
      * Carries out an in-place bitwise xor (^) operation on this number and the one provided.
-     * @param right The right number.
+     * @param right - The right number.
      * @returns The new value of this ^ right.
      */
     public xor(right: LongInt | number): this {
         const rightLongInt = this.getMatchingLongInt(right);
 
         for (let i = 0; i < this.data.length; i++)
-            this.data[i] ^= rightLongInt.data[i]!;
+            this.data[i]! ^= rightLongInt.data[i]!;
 
         return this;
     }
@@ -207,7 +214,7 @@ export default class LongInt {
 
     /**
      * Carries out an in-place bitwise left shift (<<) operation on this number.
-     * @param shiftAmount The number of places to shift.
+     * @param shiftAmount - The number of places to shift.
      * @returns The result of this << shiftAmount.
      */
     public leftShift(shiftAmount: number): this {
@@ -229,9 +236,9 @@ export default class LongInt {
 
     /**
      * Carries out an in-place bitwise unsigned right shift (>>>) operation on this number.
-     * @param shiftAmount The number of places to shift.
+     * @param shiftAmount - The number of places to shift.
      * @returns The result of this >>> shiftAmount.
-    */
+     */
     public rightShift(shiftAmount: number): this {
         if (shiftAmount === 0)
             return this;
@@ -251,7 +258,7 @@ export default class LongInt {
 
     /**
      * Carries out an in-place bitwise arithmetic right shift (>>) operation on this number.
-     * @param shiftAmount The number of places to shift.
+     * @param shiftAmount - The number of places to shift.
      * @returns The result of this >> shiftAmount.
      */
     public arithmeticRightShift(shiftAmount: number): this {
@@ -273,7 +280,7 @@ export default class LongInt {
 
     /**
      * Determines whether or not this LongInt has equal value to another.
-     * @param value The LongInt or number to compare to.
+     * @param value - The LongInt or number to compare to.
      * @returns Whether or not they are equal.
      */
     public equals(value: LongInt | number): boolean {
@@ -292,20 +299,20 @@ export default class LongInt {
 
     /**
      * Returns a string representation of the LongInt.
-     * @param type The base of the string to print.
+     * @param type - The base of the string to print.
      * @returns The string representation.
      */
     public toString(type: StringType): string {
         let padLength = 0;
 
         switch (type) {
-            case 2:
+            case StringType.BINARY:
                 padLength = 32;
                 break;
-            case 10:
+            case StringType.DECIMAL:
                 padLength = 10;
                 break;
-            case 16:
+            case StringType.HEXADECIMAL:
                 padLength = 8;
                 break;
         }
@@ -318,31 +325,31 @@ export default class LongInt {
 
     /**
      * Creates a new LongInt object with the given value, stretched or truncated to the same size as this.
-     * @param longInt The LongInt object to use as the value.
+     * @param longInt - The LongInt object to use as the value.
      * @returns The new LongInt.
      */
     private getMatchingLongInt(longInt: LongInt): LongInt;
     /**
      * Creates a new LongInt object using the given value, stretched or truncated to the same size as this.
-     * @param values An array of 32-bit numbers to use as the value.
+     * @param values - An array of 32-bit numbers to use as the value.
      * @returns The new LongInt.
      */
     private getMatchingLongInt(values: number[] | Uint32Array): LongInt;
     /**
      * Creates a new LongInt object using the given value, stretched or truncated to the same size as this.
-     * @param value A 32-bit number to use as the value.
+     * @param value - A 32-bit number to use as the value.
      * @returns The new LongInt.
      */
     private getMatchingLongInt(value?: number): LongInt;
     /**
      * Creates a LongInt with the same dimensions as this one, using the given input.
-     * @param value The value of the LongInt.
+     * @param value - The value of the LongInt to create.
      * @returns The new LongInt.
      */
     private getMatchingLongInt(value: LongInt | number[] | Uint32Array | number): LongInt;
     /**
      * Creates a LongInt with the same dimensions as this one, using the given input.
-     * @param value The value of the LongInt.
+     * @param value - The value of the LongInt to create.
      * @returns The new LongInt.
      */
     private getMatchingLongInt(value: LongInt | number[] | Uint32Array | number = 0): LongInt {
@@ -386,8 +393,8 @@ export default class LongInt {
 
     /**
      * Shifts the 32-bit number array to the right.
-     * @param count How many places to shift the array.
-     * @param fillValue The value to fill empty spaces with.
+     * @param count - How many places to shift the array.
+     * @param fillValue - The value to fill empty spaces with.
      * @returns The new value of this.
      */
     private shiftArrayRight(count: number, fillValue: number = 0): this {
@@ -402,8 +409,8 @@ export default class LongInt {
 
     /**
      * Shifts the 32-bit number array to the left.
-     * @param count How many places to shift the array.
-     * @param fillValue The value to fill empty spaces with.
+     * @param count - How many places to shift the array.
+     * @param fillValue - The value to fill empty spaces with.
      * @returns The new value of this.
      */
     private shiftArrayLeft(count: number, fillValue: number = 0): this {

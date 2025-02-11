@@ -1,5 +1,6 @@
 import type Board from "./board.js";
 import { EventEmitter } from "eventemitter3";
+import type LongInt from "../bitBoard/longInt.js";
 import type { Position } from "./board.js";
 
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
@@ -12,17 +13,21 @@ export type GameConstructorOptions<T> = {
 };
 export type GameConstructor<T> = {
     // eslint-disable-next-line @typescript-eslint/prefer-function-type
-    new (playerOneType: PlayerType, playerTwoType: PlayerType, options: GameConstructorOptions<T>): Controller<T>;
+    new(playerOneType: PlayerType, playerTwoType: PlayerType, options: GameConstructorOptions<T>): Controller<T>;
 };
 /**
  * Decorator to check that the constructor type for the given class is correct.
- * @param constructor The class to check.
+ * @template T - The type of the game ID.
+ * @param constructor - The class to check.
  */
 export function Game<T>(constructor: GameConstructor<T>): void {
     void constructor;
 }
 
-/** Represents a game controller. */
+/**
+ * Represents a game controller.
+ * @template T - The type of the game ID.
+ */
 export default abstract class Controller<T> extends EventEmitter<{
     end: GameConstructorOptions<T>["onEnd"];
     input: GameConstructorOptions<T>["onInvalidInput"];
@@ -32,7 +37,7 @@ export default abstract class Controller<T> extends EventEmitter<{
     public readonly gameID: T;
 
     /** Contains the board. */
-    public readonly board: Board;
+    public readonly board: Board<LongInt | number>;
 
     /** Contains the view object. */
     public readonly render: Required<GameConstructorOptions<T>>["renderer"];
@@ -45,15 +50,17 @@ export default abstract class Controller<T> extends EventEmitter<{
 
     /**
      * Creates an instance of Controller.
-     * @param playerTypes The types of player.
-     * @param view The view object.
-     * @param gameID The ID of the game.
-     * @param board The board.
+     * @param playerTypes - The types of player for the game.
+     * @param board - The board object.
+     * @param render - The render function.
+     * @param gameID - The ID of the game instance.
+     * @param onEnd - The function to call when the game ends.
+     * @param onInvalidInput - The function to call when the input is invalid.
      */
-    // eslint-disable-next-line @typescript-eslint/max-params, require-jsdoc
+    // eslint-disable-next-line @typescript-eslint/max-params
     protected constructor(
         playerTypes: PlayerType[],
-        board: Board,
+        board: Board<LongInt | number>,
         render: Controller<T>["render"],
         gameID: T,
         onEnd?: GameConstructorOptions<T>["onEnd"],
@@ -72,14 +79,17 @@ export default abstract class Controller<T> extends EventEmitter<{
             this.on("invalidInput", onInvalidInput);
     }
 
-    /** Gets the current player object. */
+    /**
+     * Gets the current player object.
+     * @returns The current player object.
+     */
     public get currentPlayer(): { id: number; playerType: PlayerType; } {
         return this.players[this.currentPlayerId]!;
     }
 
     /**
      * Controls the main game flow.
-     * @param algorithm The algorithm to use.
+     * @param algorithm - The algorithm to use.
      * @returns The winner or null in the event of a tie.
      */
     public async play(algorithm: Algorithm = "alphabeta"): Promise<void> {
@@ -97,10 +107,9 @@ export default abstract class Controller<T> extends EventEmitter<{
     }
 
     /**
-     * The bog standard minimax algorithm. Left in for reference.
-     * @link https://en.wikipedia.org/wiki/Minimax
-     * @param depth The depth of the algorithm.
-     * @param maximisingPlayer Whether or not the current player is the maximising player.
+     * The bog standard minimax algorithm. Left in for reference (https://en.wikipedia.org/wiki/Minimax).
+     * @param depth - The depth of the algorithm.
+     * @param maximisingPlayer - Whether or not the current player is the maximising player.
      * @returns The optimal move.
      */
     protected minimax(depth: number = Infinity, maximisingPlayer: boolean = true): { move: Position; score: number; } {
@@ -142,12 +151,11 @@ export default abstract class Controller<T> extends EventEmitter<{
     }
 
     /**
-     * The minimax algorithm with alpha-beta pruning.
-     * @link https://en.wikipedia.org/wiki/Minimax
-     * @param depth The depth of the algorithm.
-     * @param alpha The bounds for the alpha-beta variation of the algorithm.
-     * @param beta The bounds for the alpha-beta variation of the algorithm.
-     * @param maximisingPlayer Whether or not the current player is the maximising player.
+     * The minimax algorithm with alpha-beta pruning (https://en.wikipedia.org/wiki/Minimax).
+     * @param depth - The depth of the algorithm.
+     * @param alpha - The bounds for the alpha-beta variation of the algorithm.
+     * @param beta - The bounds for the alpha-beta variation of the algorithm.
+     * @param maximisingPlayer - Whether or not the current player is the maximising player.
      * @returns The optimal move.
      */
     protected alphabeta(
@@ -212,7 +220,7 @@ export default abstract class Controller<T> extends EventEmitter<{
 
     /**
      * Makes a move.
-     * @param input Either the algorithm to use to calculate the move or the move itself.
+     * @param input - Either the algorithm to use to calculate the move or the move itself.
      */
     private async makeMove(input: Algorithm | Position): Promise<void> {
         if (typeof input === "string") {
@@ -241,16 +249,23 @@ export default abstract class Controller<T> extends EventEmitter<{
 
     /**
      * Determines the CPU move.
-     * @param difficulty The difficulty of the AI.
-     * @param algorithm The algorithm to use.
+     * @param difficulty - The difficulty of the AI.
+     * @param algorithm - The algorithm to use.
      * @returns The move.
      */
     public abstract determineCPUMove(difficulty: Omit<PlayerType, "human">, algorithm?: Algorithm): Position;
 
     /**
      * Finds the optimal move.
-     * @param options The options.
-     * @returns The optimal move.
+     * @param options - The options to use.
+     * @param options.algorithm - The algorithm to use.
+     * @param options.maxDepth - The maximum depth to search.
+     * @param options.randomMove - A random move to make.
+     * @returns The optimal move to make.
      */
-    public abstract findOptimalMove(options?: { algorithm?: Algorithm; maxDepth?: number; randomMove?: Position; }): Position;
+    public abstract findOptimalMove(options?: {
+        algorithm?: Algorithm;
+        maxDepth?: number;
+        randomMove?: Position;
+    }): Position;
 }

@@ -5,27 +5,27 @@ import LongInt from "./longInt.js";
 export default class LongIntBitBoard extends BitBoard<LongInt> {
     /**
      * Creates an instance of LongIntBitBoard.
-     * @param longInt The data to fill the BitBoard with.
-    */
+     * @param longInt - The data to fill the BitBoard with.
+     */
     public constructor(longInt: LongInt);
     /**
      * Creates an instance of LongIntBitBoard.
-     * @param uint32Array The data to fill the BitBoard with.
+     * @param uint32Array - The data to fill the BitBoard with.
      */
     public constructor(uint32Array: Uint32Array);
     /**
      * Creates an instance of LongIntBitBoard.
-     * @param numberArray The data to fill the BitBoard with.
+     * @param numberArray - The data to fill the BitBoard with.
      */
     public constructor(numberArray: number[]);
     /**
      * Creates an instance of LongIntBitBoard.
-     * @param length The length of the LongInt.
+     * @param length - The length of the LongInt array.
      */
     public constructor(length: number);
     /**
      * Creates an instance of LongIntBitBoard.
-     * @param args The data to fill the BitBoard with.
+     * @param args - The data to fill the BitBoard with.
      */
     public constructor(args?: LongInt | number[] | Uint32Array | number) {
         switch (true) {
@@ -48,7 +48,7 @@ export default class LongIntBitBoard extends BitBoard<LongInt> {
 
     /**
      * Gets the value of a given bit.
-     * @param bit The bit to get.
+     * @param bit - The bit to get.
      * @returns The value of the bit.
      */
     public getBit(bit: number): 0 | 1 {
@@ -57,7 +57,7 @@ export default class LongIntBitBoard extends BitBoard<LongInt> {
 
     /**
      * Sets the value for a given bit to 1.
-     * @param bit The bit to set.
+     * @param bit - The bit to set.
      */
     public setBit(bit: number): void {
         const mask = LongInt.getMatchingLongInt(this._data, 1)
@@ -68,7 +68,7 @@ export default class LongIntBitBoard extends BitBoard<LongInt> {
 
     /**
      * Sets the value for a given bit to 0.
-     * @param bit The bit to clear.
+     * @param bit - The bit to clear.
      */
     public clearBit(bit: number): void {
         const mask = LongInt.getMatchingLongInt(this._data, 1)
@@ -80,7 +80,7 @@ export default class LongIntBitBoard extends BitBoard<LongInt> {
 
     /**
      * Toggles the data for a given bit between 0 and 1.
-     * @param bit The bit to toggle.
+     * @param bit - The bit to toggle.
      */
     public toggleBit(bit: number): void {
         const mask = LongInt.getMatchingLongInt(this._data, 1)
@@ -103,9 +103,9 @@ export default class LongIntBitBoard extends BitBoard<LongInt> {
 
     /**
      * Gets a given number of bits.
-     * @param LSB The least significant bit to get.
-     * @param numberOfBits The number of bits to get.
-     * @returns The bits.
+     * @param LSB - The least significant bit to get.
+     * @param numberOfBits - The number of bits to get.
+     * @returns The bits as a number.
      */
     public getBits(LSB: number, numberOfBits: number): LongInt {
         const arr: number[] = [];
@@ -122,69 +122,69 @@ export default class LongIntBitBoard extends BitBoard<LongInt> {
 
     /**
      * Carries out a bitwise and (&) operation.
-     * @param right The right value.
+     * @param right - The right value.
      * @returns The result.
      */
-    public and(right: LongIntBitBoard | number): this {
-        return new LongIntBitBoard(LongInt.and(this._data, right instanceof LongIntBitBoard ? right.data : right)) as this;
+    public and(right: LongIntBitBoard | number): LongIntBitBoard {
+        return new LongIntBitBoard(LongInt.and(this._data, right instanceof LongIntBitBoard ? right.data : right));
     }
 
     /**
      * Carries out a bitwise or (|) operation.
-     * @param right The right value.
+     * @param right - The right value.
      * @returns The result.
      */
-    public or(right: LongIntBitBoard | number): this {
-        return new LongIntBitBoard(LongInt.or(this._data, right instanceof LongIntBitBoard ? right.data : right)) as this;
+    public or(right: LongIntBitBoard | number): LongIntBitBoard {
+        return new LongIntBitBoard(LongInt.or(this._data, right instanceof LongIntBitBoard ? right.data : right));
     }
 
     /**
      * Carries out a bitwise xor (^) operation.
-     * @param right The right value.
+     * @param right - The right value.
      * @returns The result.
      */
-    public xor(right: LongIntBitBoard | number): this {
-        return new LongIntBitBoard(LongInt.xor(this._data, right instanceof LongIntBitBoard ? right.data : right)) as this;
+    public xor(right: LongIntBitBoard | number): LongIntBitBoard {
+        return new LongIntBitBoard(LongInt.xor(this._data, right instanceof LongIntBitBoard ? right.data : right));
     }
 
     /**
      * Carries out a bitwise not (~) operation.
      * @returns The result.
      */
-    public not(): this {
-        return new LongIntBitBoard(LongInt.not(this._data)) as this;
+    public not(): LongIntBitBoard {
+        return new LongIntBitBoard(LongInt.not(this._data));
     }
 
     /**
      * Carries out a bitwise left shift (<<) operation.
-     * @param shiftAmount How much to shift it by.
+     * @param shiftAmount - How much to shift it by.
      * @returns The result.
      */
-    public leftShift(shiftAmount: number): this {
-        return new LongIntBitBoard(LongInt.leftShift(this._data, shiftAmount)) as this;
+    public leftShift(shiftAmount: number): LongIntBitBoard {
+        return new LongIntBitBoard(LongInt.leftShift(this._data, shiftAmount));
     }
 
     /**
      * Carries out a bitwise logical right shift (>>>) operation.
-     * @param shiftAmount How much to shift it by.
+     * @param shiftAmount - How much to shift it by.
      * @returns The result.
      */
-    public rightShift(shiftAmount: number): this {
-        return new LongIntBitBoard(LongInt.rightShift(this._data, shiftAmount)) as this;
+    public rightShift(shiftAmount: number): LongIntBitBoard {
+        return new LongIntBitBoard(LongInt.rightShift(this._data, shiftAmount));
     }
 
     /**
      * Carries out a bitwise arithmetic right shift (>>) operation.
-     * @param shiftAmount How much to shift it by.
+     * @param shiftAmount - How much to shift it by.
      * @returns The result.
      */
-    public arithmeticRightShift(shiftAmount: number): this {
-        return new LongIntBitBoard(LongInt.arithmeticRightShift(this._data, shiftAmount)) as this;
+    public arithmeticRightShift(shiftAmount: number): LongIntBitBoard {
+        return new LongIntBitBoard(LongInt.arithmeticRightShift(this._data, shiftAmount));
     }
 
     /**
      * Checks if two BitBoards have equal data values.
-     * @param value The value to compare against.
+     * @param value - The value to compare against.
      * @returns Whether or not the two BitBoard have the same data value.
      */
     public equals(value: LongInt | LongIntBitBoard | number): boolean {

@@ -4,7 +4,7 @@ import LongIntBitBoard from "../../bitBoard/longIntBitBoard.js";
 import type { Position } from "../../base/board.js";
 
 /** Represents a Connect 4 board. */
-export default class Board extends Base<LongIntBitBoard> {
+export default class Board extends Base<LongInt> {
     protected winningStates: LongIntBitBoard[] = [];
 
     private readonly FULL_BOARD = new LongInt([0b1111_1111111_1111111_1111111_1111111, 0b1111111_111]);
@@ -50,7 +50,10 @@ export default class Board extends Base<LongIntBitBoard> {
         }
     }
 
-    /** Calculates the heuristic score for the current board state. */
+    /**
+     * Calculates the heuristic score for the current board state.
+     * @returns The heuristic score.
+     */
     public get heuristic(): number {
         const { winner } = this;
 
@@ -82,11 +85,14 @@ export default class Board extends Base<LongIntBitBoard> {
         return p0Score - p1Score;
     }
 
-    /** Generates a list of empty cells. */
+    /**
+     * Generates a list of empty cells.
+     * @returns The list of empty cells.
+     */
     public override get emptyCells(): Position[] {
         const emptyCells: Position[] = [];
 
-        for (let x = 0; x < this.boardWidth; x++) {
+        for (let x = 0; x < this.width; x++) {
             const cell: Position = { x, y: 0 };
 
             if (this.cellOccupier(cell) === null)
@@ -98,8 +104,8 @@ export default class Board extends Base<LongIntBitBoard> {
 
     /**
      * Makes a move on the board.
-     * @param move The move to make.
-     * @param playerId The player making the move.
+     * @param move - The move to make.
+     * @param playerId - The player making the move.
      */
     public override makeMove(move: Position, playerId: number): void {
         const updatedMove = move;

@@ -2,7 +2,7 @@ import Base from "../../base/board.js";
 import IntBitBoard from "../../bitBoard/intBitBoard.js";
 
 /** Represents a Tic Tac Toe board. */
-export default class Board extends Base<IntBitBoard> {
+export default class Board extends Base<number> {
     protected winningStates: IntBitBoard[] = [0x007, 0x038, 0x1C0, 0x049, 0x092, 0x124, 0x111, 0x054]
         .map((data) => new IntBitBoard(data));
 
@@ -11,7 +11,10 @@ export default class Board extends Base<IntBitBoard> {
         super(3, 3);
     }
 
-    /** Calculates the heuristic score for the current board state. */
+    /**
+     * Calculates the heuristic score for the current board state.
+     * @returns The heuristic score.
+     */
     public get heuristic(): number {
         const { winner } = this;
 

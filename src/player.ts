@@ -26,9 +26,10 @@ const games: Array<{
 
 /**
  * Gets a new input from the command line until a valid one is given.
- * @param isValid A function to check whether or not the given input is valid.
- * @param update A function to parse each input string.
- * @param message The prompt message for each input,
+ * @template T - The type of the input.
+ * @param isValid - A function to check whether or not the given input is valid.
+ * @param update - A function to parse each input string.
+ * @param message - The prompt message for each input,.
  * @returns The parsed valid input.
  */
 async function getValidInput<T>(
@@ -51,7 +52,8 @@ async function getValidInput<T>(
 
 /**
  * Sleeps for a given number of milliseconds.
- * @param ms The number of milliseconds to sleep for.
+ * @param ms - The number of milliseconds to sleep for.
+ * @returns A promise that resolves after the given number of milliseconds.
  */
 async function sleep(ms: number): Promise<void> {
     return new Promise((resolve) => {
@@ -87,14 +89,19 @@ async function getPlayerCount(): Promise<number> {
 
 /**
  * Gets the difficulty of the CPU player from the command line.
- * @param playerCount The number of players.
+ * @param playerCount - The number of players.
  * @returns The difficulty of the CPU player.
  */
 async function getDifficulty(playerCount: number): Promise<PlayerType | undefined> {
     return playerCount === 1
         ? getValidInput(
             (value) => value !== undefined,
-            (inputString) => (["easyCPU", "mediumCPU", "hardCPU", "impossibleCPU"] as const)[parseInt(inputString, 10) - 1],
+            (inputString) => ([
+                "easyCPU",
+                "mediumCPU",
+                "hardCPU",
+                "impossibleCPU",
+            ] as const)[parseInt(inputString, 10) - 1],
             "Select a difficulty (1-4):",
             "1. Easy",
             "2. Medium",
@@ -107,11 +114,17 @@ async function getDifficulty(playerCount: number): Promise<PlayerType | undefine
 
 /**
  * Gets the next input from the command line.
- * @param playerID The ID of the player whose turn it is.
- * @param param1 The parameters for the game.
+ * @param playerID - The ID of the player whose turn it is.
+ * @param game - The parameters for the game.
+ * @param game.inputPrompt - The prompt for the input.
+ * @param game.inputValidator - The regular expression to validate the input.
+ * @param game.moveDimensions - The number of dimensions for the move.
  * @returns The next input.
  */
-async function getInput(playerID: number, { inputPrompt, inputValidator, moveDimensions }: typeof games[0]): Promise<Position> {
+async function getInput(
+    playerID: number,
+    { inputPrompt, inputValidator, moveDimensions }: typeof games[0],
+): Promise<Position> {
     let input: string;
     let testedInput: RegExpExecArray | null = null;
 
@@ -147,7 +160,7 @@ await (async function main(): Promise<void> {
     await game.play();
 
     if (playerCount > 0) {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-unmodified-loop-condition -- false positive
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition, no-unmodified-loop-condition
         while (!gameOver) {
             /* eslint-disable no-await-in-loop */
             const input = await getInput(game.currentPlayer.id, gameObject);

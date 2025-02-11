@@ -3,8 +3,7 @@ import readline from "readline/promises";
 
 /**
  * Reads from the console.
- *
- * @param prompt The question to get the answer to.
+ * @param prompt - The question to get the answer to.
  * @returns The value read.
  */
 async function readLine(prompt: string = ""): Promise<string> {
@@ -18,7 +17,7 @@ async function readLine(prompt: string = ""): Promise<string> {
 
 /**
  * Writes to the console.
- * @param text The text to write.
+ * @param text - The text to write.
  */
 function writeLine(...text: string[]): void {
     console.log(...text);
