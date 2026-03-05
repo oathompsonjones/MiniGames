@@ -1,6 +1,6 @@
 {
     "name": "@oathompsonjones/mini-games",
-    "version": "1.0.9",
+    "version": "1.0.10",
     "description": "A selection of MiniGames. You will soon be able to play these games on [my website](https://oathompsonjones.co.uk/arcade).",
     "repository": {
         "url": "https://github.com/oathompsonjones/MiniGames.git"
@@ -25,7 +25,8 @@
         "typescript": "^5.9.3"
     },
     "dependencies": {
-        "eventemitter3": "^5.0.4"
+        "eventemitter3": "^5.0.4",
+        "readline": "^1.3.0"
     },
     "packageManager": "pnpm@9.11.0+sha512.0a203ffaed5a3f63242cd064c8fb5892366c103e328079318f78062f24ea8c9d50bc6a47aa3567cabefd824d170e78fa2745ed1f16b132e16436146b7688f19b"
 }
