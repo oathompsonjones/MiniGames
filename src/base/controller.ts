@@ -40,7 +40,7 @@ export default abstract class Controller<T> extends EventEmitter<{
     public readonly board: Board<LongInt | number>;
 
     /** Contains the view object. */
-    public readonly render: Required<GameConstructorOptions<T>>["renderer"];
+    public readonly render: () => Promise<void> | void;
 
     /** Contains the player objects. */
     protected readonly players: Array<{ id: number; playerType: PlayerType; }>;
@@ -61,7 +61,7 @@ export default abstract class Controller<T> extends EventEmitter<{
     protected constructor(
         playerTypes: PlayerType[],
         board: Board<LongInt | number>,
-        render: Controller<T>["render"],
+        render: Required<GameConstructorOptions<T>>["renderer"],
         gameID: T,
         onEnd?: GameConstructorOptions<T>["onEnd"],
         onInvalidInput?: GameConstructorOptions<T>["onInvalidInput"],
@@ -70,7 +70,7 @@ export default abstract class Controller<T> extends EventEmitter<{
         this.gameID = gameID;
         this.board = board;
         this.players = playerTypes.map((playerType, id) => ({ id, playerType }));
-        this.render = render;
+        this.render = render.bind(null, this);
 
         if (onEnd !== undefined)
             this.on("end", onEnd);
@@ -93,7 +93,7 @@ export default abstract class Controller<T> extends EventEmitter<{
      * @returns The winner or null in the event of a tie.
      */
     public async play(algorithm: Algorithm = "alphabeta"): Promise<void> {
-        await this.render(this);
+        await this.render();
         this.on("input", async (move: Position): Promise<void> => {
             await this.makeMove(move);
 
@@ -235,7 +235,7 @@ export default abstract class Controller<T> extends EventEmitter<{
             this.board.makeMove(input, this.currentPlayer.id);
         }
 
-        await this.render(this);
+        await this.render();
         const { winner } = this.board;
 
         if (winner !== false) {
