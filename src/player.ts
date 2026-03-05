@@ -1,8 +1,9 @@
+/* eslint-disable no-console */
 import type { GameConstructor, PlayerType } from "./base/controller.js";
 import Connect4 from "./games/connect4/controller.js";
-import Console from "./console.js";
 import type { Position } from "./base/board.js";
 import TicTacToe from "./games/tictactoe/controller.js";
+import readline from "readline/promises";
 
 const games: Array<{
     Game: GameConstructor<string>;
@@ -25,6 +26,20 @@ const games: Array<{
 ];
 
 /**
+ * Reads from the console.
+ * @param prompt - The question to get the answer to.
+ * @returns The value read.
+ */
+async function readLine(prompt: string = ""): Promise<string> {
+    const reader = readline.createInterface(process.stdin, process.stdout);
+    const input = await reader.question(prompt);
+
+    reader.close();
+
+    return input;
+}
+
+/**
  * Gets a new input from the command line until a valid one is given.
  * @template T - The type of the input.
  * @param isValid - A function to check whether or not the given input is valid.
@@ -40,9 +55,9 @@ async function getValidInput<T>(
     let output: T | undefined;
 
     do {
-        Console.clear();
+        console.clear();
         // eslint-disable-next-line no-await-in-loop
-        const inputString = await Console.readLine(message.join("\n"));
+        const inputString = await readLine(message.join("\n"));
 
         output = update(inputString);
     } while (!isValid(output));
@@ -130,7 +145,7 @@ async function getInput(
 
     do {
         // eslint-disable-next-line no-await-in-loop
-        input = await Console.readLine(`Player ${playerID + 1}'s move ${inputPrompt}: `);
+        input = await readLine(`Player ${playerID + 1}'s move ${inputPrompt}: `);
         testedInput = inputValidator.exec(input);
     } while (testedInput === null);
 
@@ -140,8 +155,8 @@ async function getInput(
 }
 
 await (async function main(): Promise<void> {
-    Console.clear();
-    const start = await Console.readLine("Would you like to play a game? (Y/N) ");
+    console.clear();
+    const start = await readLine("Would you like to play a game? (Y/N) ");
 
     if (start.toLowerCase() !== "y")
         return;
@@ -170,7 +185,7 @@ await (async function main(): Promise<void> {
         }
     }
 
-    await Console.readLine("");
+    await readLine("");
 
     await main();
 })();

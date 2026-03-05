@@ -1,7 +1,6 @@
 import type { Algorithm, GameConstructorOptions, PlayerType } from "../../base/controller.js";
 import Base, { Game } from "../../base/controller.js";
 import Board from "./board.js";
-import Console from "../../console.js";
 import type { Position } from "../../base/board.js";
 
 /**
@@ -10,12 +9,14 @@ import type { Position } from "../../base/board.js";
  * @param controller - The controller to render.
  */
 function defaultRender<T>(controller: Connect4<T>): void {
-    Console.clear();
-    Console.writeLine(controller.board.toString(true, true, false, ["⬤ ", "⬤ "]));
+    /* eslint-disable no-console */
+    console.clear();
+    console.log(controller.board.toString(true, true, false, ["⬤ ", "⬤ "]));
     const { winner } = controller.board;
 
     if (winner !== false)
-        Console.writeLine(winner === null ? "It's a tie!" : `Player ${winner + 1} wins!`);
+        console.log(winner === null ? "It's a tie!" : `Player ${winner + 1} wins!`);
+    /* eslint-enable no-console */
 }
 
 /**
