@@ -1,12 +1,13 @@
 /* eslint-disable no-console */
 import type { GameConstructor, PlayerType } from "./base/controller.js";
 import Connect4 from "./games/connect4/controller.js";
+import type LongInt from "./bitBoard/longInt.js";
 import type { Position } from "./base/board.js";
 import TicTacToe from "./games/tictactoe/controller.js";
 import readline from "readline/promises";
 
 const games: Array<{
-    Game: GameConstructor<string>;
+    Game: GameConstructor<string, LongInt | number>;
     inputPrompt: string;
     inputValidator: RegExp;
     moveDimensions?: number;

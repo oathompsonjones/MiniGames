@@ -5,39 +5,41 @@ import type { Position } from "./board.js";
 
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
 export type Algorithm = "alphabeta" | "minimax";
-export type GameConstructorOptions<T> = {
+export type GameConstructorOptions<T, U extends LongInt | number> = {
     id: T;
     onEnd?: (winner: number | null) => Promise<void> | void;
     onInvalidInput?: (position: Position) => Promise<void> | void;
-    renderer?: (controller: Controller<T>) => Promise<void> | void;
+    renderer?: (controller: Controller<T, U>) => Promise<void> | void;
 };
-export type GameConstructor<T> = {
+export type GameConstructor<T, U extends LongInt | number> = {
     // eslint-disable-next-line @typescript-eslint/prefer-function-type
-    new(playerOneType: PlayerType, playerTwoType: PlayerType, options: GameConstructorOptions<T>): Controller<T>;
+    new(playerOneType: PlayerType, playerTwoType: PlayerType, options: GameConstructorOptions<T, U>): Controller<T, U>;
 };
 /**
  * Decorator to check that the constructor type for the given class is correct.
  * @template T - The type of the game ID.
+ * @template U - The type of the board values.
  * @param constructor - The class to check.
  */
-export function Game<T>(constructor: GameConstructor<T>): void {
+export function Game<T, U extends LongInt | number>(constructor: GameConstructor<T, U>): void {
     void constructor;
 }
 
 /**
  * Represents a game controller.
  * @template T - The type of the game ID.
+ * @template U - The type of the board values.
  */
-export default abstract class Controller<T> extends EventEmitter<{
-    end: GameConstructorOptions<T>["onEnd"];
-    input: GameConstructorOptions<T>["onInvalidInput"];
-    invalidInput: GameConstructorOptions<T>["onInvalidInput"];
+export default abstract class Controller<T, U extends LongInt | number> extends EventEmitter<{
+    end: GameConstructorOptions<T, U>["onEnd"];
+    input: GameConstructorOptions<T, U>["onInvalidInput"];
+    invalidInput: GameConstructorOptions<T, U>["onInvalidInput"];
 }> {
     /** Contains the ID of the game. */
     public readonly gameID: T;
 
     /** Contains the board. */
-    public readonly board: Board<LongInt | number>;
+    public readonly board: Board<U>;
 
     /** Contains the view object. */
     public readonly render: () => Promise<void> | void;
@@ -60,11 +62,11 @@ export default abstract class Controller<T> extends EventEmitter<{
     // eslint-disable-next-line @typescript-eslint/max-params
     protected constructor(
         playerTypes: PlayerType[],
-        board: Board<LongInt | number>,
-        render: Required<GameConstructorOptions<T>>["renderer"],
+        board: Board<U>,
+        render: Required<GameConstructorOptions<T, U>>["renderer"],
         gameID: T,
-        onEnd?: GameConstructorOptions<T>["onEnd"],
-        onInvalidInput?: GameConstructorOptions<T>["onInvalidInput"],
+        onEnd?: GameConstructorOptions<T, U>["onEnd"],
+        onInvalidInput?: GameConstructorOptions<T, U>["onInvalidInput"],
     ) {
         super();
         this.gameID = gameID;
@@ -73,10 +75,10 @@ export default abstract class Controller<T> extends EventEmitter<{
         this.render = render.bind(null, this);
 
         if (onEnd !== undefined)
-            this.on("end", onEnd);
+            this.on("end", onEnd as () => void);
 
         if (onInvalidInput !== undefined)
-            this.on("invalidInput", onInvalidInput);
+            this.on("invalidInput", onInvalidInput as () => void);
     }
 
     /**
@@ -94,12 +96,12 @@ export default abstract class Controller<T> extends EventEmitter<{
      */
     public async play(algorithm: Algorithm = "alphabeta"): Promise<void> {
         await this.render();
-        this.on("input", async (move: Position): Promise<void> => {
+        this.on("input", (async (move: Position): Promise<void> => {
             await this.makeMove(move);
 
             if (this.currentPlayer.playerType !== "human")
                 await this.makeMove(algorithm);
-        });
+        }) as (move: Position) => void);
 
         while (this.currentPlayer.playerType !== "human" && this.board.winner === false)
             // eslint-disable-next-line no-await-in-loop

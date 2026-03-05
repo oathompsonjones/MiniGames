@@ -24,14 +24,18 @@ function defaultRender<T>(controller: TicTacToe<T>): void {
  * @template T - The type of the game ID.
  */
 @Game
-export default class TicTacToe<T> extends Base<T> {
+export default class TicTacToe<T> extends Base<T, number> {
     /**
      * Creates a new TicTacToe game.
      * @param playerOneType - The type of player one (human or CPU).
      * @param playerTwoType - The type of player two (human or CPU).
      * @param options - The options for the game.
      */
-    public constructor(playerOneType: PlayerType, playerTwoType: PlayerType, options: GameConstructorOptions<T>) {
+    public constructor(
+        playerOneType: PlayerType,
+        playerTwoType: PlayerType,
+        options: GameConstructorOptions<T, number>,
+    ) {
         super(
             [playerOneType, playerTwoType],
             new Board(),

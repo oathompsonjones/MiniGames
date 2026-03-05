@@ -1,6 +1,7 @@
 import type { Algorithm, GameConstructorOptions, PlayerType } from "../../base/controller.js";
 import Base, { Game } from "../../base/controller.js";
 import Board from "./board.js";
+import type LongInt from "../../bitBoard/longInt.js";
 import type { Position } from "../../base/board.js";
 
 /**
@@ -24,14 +25,18 @@ function defaultRender<T>(controller: Connect4<T>): void {
  * @template T - The type of the game ID.
  */
 @Game
-export default class Connect4<T> extends Base<T> {
+export default class Connect4<T> extends Base<T, LongInt> {
     /**
      * Creates an instance of Connect4.
      * @param playerOneType - The type of player one (human or CPU).
      * @param playerTwoType - The type of player two (human or CPU).
      * @param options - The options for the game.
      */
-    public constructor(playerOneType: PlayerType, playerTwoType: PlayerType, options: GameConstructorOptions<T>) {
+    public constructor(
+        playerOneType: PlayerType,
+        playerTwoType: PlayerType,
+        options: GameConstructorOptions<T, LongInt>,
+    ) {
         super(
             [playerOneType, playerTwoType],
             new Board(),
