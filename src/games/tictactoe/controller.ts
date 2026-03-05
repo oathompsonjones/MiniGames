@@ -5,10 +5,9 @@ import type { Position } from "../../base/board.js";
 
 /**
  * The default rendering function for TicTacToe.
- * @template T - The type of the game ID.
  * @param controller - The controller to render.
  */
-function defaultRender<T>(controller: TicTacToe<T>): void {
+function defaultRender(controller: TicTacToe): void {
     /* eslint-disable no-console */
     console.clear();
     console.log(controller.board.toString(false));
@@ -19,12 +18,9 @@ function defaultRender<T>(controller: TicTacToe<T>): void {
     /* eslint-enable no-console */
 }
 
-/**
- * A game of TicTacToe.
- * @template T - The type of the game ID.
- */
+/** A game of TicTacToe. */
 @Game
-export default class TicTacToe<T> extends Base<T, number> {
+export default class TicTacToe extends Base<Board> {
     /**
      * Creates a new TicTacToe game.
      * @param playerOneType - The type of player one (human or CPU).
@@ -34,15 +30,14 @@ export default class TicTacToe<T> extends Base<T, number> {
     public constructor(
         playerOneType: PlayerType,
         playerTwoType: PlayerType,
-        options: GameConstructorOptions<T, number>,
+        options?: GameConstructorOptions<Board>,
     ) {
         super(
             [playerOneType, playerTwoType],
             new Board(),
-            options.renderer ?? defaultRender,
-            options.id,
-            options.onEnd,
-            options.onInvalidInput,
+            options?.renderer ?? defaultRender,
+            options?.onEnd,
+            options?.onInvalidInput,
         );
     }
 

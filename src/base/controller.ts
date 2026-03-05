@@ -5,41 +5,35 @@ import type { Position } from "./board.js";
 
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
 export type Algorithm = "alphabeta" | "minimax";
-export type GameConstructorOptions<T, U extends LongInt | number> = {
-    id: T;
+export type GameConstructorOptions<T extends Board<LongInt | number>> = {
     onEnd?: (winner: number | null) => Promise<void> | void;
     onInvalidInput?: (position: Position) => Promise<void> | void;
-    renderer?: (controller: Controller<T, U>) => Promise<void> | void;
+    renderer?: (controller: Controller<T>) => Promise<void> | void;
 };
-export type GameConstructor<T, U extends LongInt | number> = {
+export type GameConstructor<T extends Board<LongInt | number>> = {
     // eslint-disable-next-line @typescript-eslint/prefer-function-type
-    new(playerOneType: PlayerType, playerTwoType: PlayerType, options: GameConstructorOptions<T, U>): Controller<T, U>;
+    new(playerOneType: PlayerType, playerTwoType: PlayerType, options?: GameConstructorOptions<T>): Controller<T>;
 };
 /**
  * Decorator to check that the constructor type for the given class is correct.
- * @template T - The type of the game ID.
- * @template U - The type of the board values.
+ * @template T - The type of board.
  * @param constructor - The class to check.
  */
-export function Game<T, U extends LongInt | number>(constructor: GameConstructor<T, U>): void {
+export function Game<T extends Board<LongInt | number>>(constructor: GameConstructor<T>): void {
     void constructor;
 }
 
 /**
  * Represents a game controller.
- * @template T - The type of the game ID.
- * @template U - The type of the board values.
+ * @template T - The type of board.
  */
-export default abstract class Controller<T, U extends LongInt | number> extends EventEmitter<{
-    end: GameConstructorOptions<T, U>["onEnd"];
-    input: GameConstructorOptions<T, U>["onInvalidInput"];
-    invalidInput: GameConstructorOptions<T, U>["onInvalidInput"];
+export default abstract class Controller<T extends Board<LongInt | number>> extends EventEmitter<{
+    end: GameConstructorOptions<T>["onEnd"];
+    input: GameConstructorOptions<T>["onInvalidInput"];
+    invalidInput: GameConstructorOptions<T>["onInvalidInput"];
 }> {
-    /** Contains the ID of the game. */
-    public readonly gameID: T;
-
     /** Contains the board. */
-    public readonly board: Board<U>;
+    public readonly board: T;
 
     /** Contains the view object. */
     public readonly render: () => Promise<void> | void;
@@ -55,21 +49,18 @@ export default abstract class Controller<T, U extends LongInt | number> extends 
      * @param playerTypes - The types of player for the game.
      * @param board - The board object.
      * @param render - The render function.
-     * @param gameID - The ID of the game instance.
      * @param onEnd - The function to call when the game ends.
      * @param onInvalidInput - The function to call when the input is invalid.
      */
-    // eslint-disable-next-line @typescript-eslint/max-params
+
     protected constructor(
         playerTypes: PlayerType[],
-        board: Board<U>,
-        render: Required<GameConstructorOptions<T, U>>["renderer"],
-        gameID: T,
-        onEnd?: GameConstructorOptions<T, U>["onEnd"],
-        onInvalidInput?: GameConstructorOptions<T, U>["onInvalidInput"],
+        board: T,
+        render: Required<GameConstructorOptions<T>>["renderer"],
+        onEnd?: GameConstructorOptions<T>["onEnd"],
+        onInvalidInput?: GameConstructorOptions<T>["onInvalidInput"],
     ) {
         super();
-        this.gameID = gameID;
         this.board = board;
         this.players = playerTypes.map((playerType, id) => ({ id, playerType }));
         this.render = render.bind(null, this);

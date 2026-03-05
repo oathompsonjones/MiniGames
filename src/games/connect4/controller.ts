@@ -1,18 +1,16 @@
 import type { Algorithm, GameConstructorOptions, PlayerType } from "../../base/controller.js";
 import Base, { Game } from "../../base/controller.js";
 import Board from "./board.js";
-import type LongInt from "../../bitBoard/longInt.js";
 import type { Position } from "../../base/board.js";
 
 /**
  * The default renderer for connect 4.
- * @template T - The type of the game ID.
  * @param controller - The controller to render.
  */
-function defaultRender<T>(controller: Connect4<T>): void {
+function defaultRender(controller: Connect4): void {
     /* eslint-disable no-console */
     console.clear();
-    console.log(controller.board.toString(true, true, false, ["⬤ ", "⬤ "]));
+    console.log(controller.board.toString(true, true, false, ["⬤", "⬤"]));
     const { winner } = controller.board;
 
     if (winner !== false)
@@ -20,12 +18,9 @@ function defaultRender<T>(controller: Connect4<T>): void {
     /* eslint-enable no-console */
 }
 
-/**
- * Represents the controller for connect 4.
- * @template T - The type of the game ID.
- */
+/** Represents the controller for connect 4. */
 @Game
-export default class Connect4<T> extends Base<T, LongInt> {
+export default class Connect4 extends Base<Board> {
     /**
      * Creates an instance of Connect4.
      * @param playerOneType - The type of player one (human or CPU).
@@ -35,15 +30,14 @@ export default class Connect4<T> extends Base<T, LongInt> {
     public constructor(
         playerOneType: PlayerType,
         playerTwoType: PlayerType,
-        options: GameConstructorOptions<T, LongInt>,
+        options?: GameConstructorOptions<Board>,
     ) {
         super(
             [playerOneType, playerTwoType],
             new Board(),
-            options.renderer ?? defaultRender,
-            options.id,
-            options.onEnd,
-            options.onInvalidInput,
+            options?.renderer ?? defaultRender,
+            options?.onEnd,
+            options?.onInvalidInput,
         );
     }
 
@@ -60,7 +54,7 @@ export default class Connect4<T> extends Base<T, LongInt> {
 
         switch (difficulty) {
             case "impossibleCPU":
-                return this.findOptimalMove({ algorithm, maxDepth: 10 });
+                return this.findOptimalMove({ algorithm, maxDepth: 7 });
             case "hardCPU":
                 return this.findOptimalMove({ algorithm, maxDepth: 5 });
             case "mediumCPU":

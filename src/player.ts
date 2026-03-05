@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import type { GameConstructor, PlayerType } from "./base/controller.js";
+import type Board from "./base/board.js";
 import Connect4 from "./games/connect4/controller.js";
 import type LongInt from "./bitBoard/longInt.js";
 import type { Position } from "./base/board.js";
@@ -7,7 +8,7 @@ import TicTacToe from "./games/tictactoe/controller.js";
 import readline from "readline/promises";
 
 const games: Array<{
-    Game: GameConstructor<string, LongInt | number>;
+    Game: GameConstructor<Board<LongInt | number>>;
     inputPrompt: string;
     inputValidator: RegExp;
     moveDimensions?: number;
@@ -170,7 +171,7 @@ await (async function main(): Promise<void> {
     const playerTwoType = playerCount > 1 ? "human" : difficulty ?? "impossibleCPU";
 
     let gameOver = false;
-    const game = new gameObject.Game(playerOneType, playerTwoType, { id: Date.now().toString(16) });
+    const game = new gameObject.Game(playerOneType, playerTwoType);
 
     game.on("end", () => (gameOver = true));
     await game.play();
