@@ -1,5 +1,5 @@
-import type { Algorithm, GameConstructorOptions, PlayerType } from "../../base/controller.js";
 import Base, { Game } from "../../base/controller.js";
+import type { GameConstructorOptions, PlayerType } from "../../base/controller.js";
 import Board from "./board.js";
 import type { Position } from "../../base/board.js";
 
@@ -44,21 +44,20 @@ export default class Connect4 extends Base<Board> {
     /**
      * Calculates the CPU's move.
      * @param difficulty - The difficulty of the CPU.
-     * @param algorithm - The algorithm to use.
      * @returns The CPU's move.
      * @throws {Error} An error if the difficulty is invalid.
      */
-    public determineCPUMove(difficulty: Omit<PlayerType, "human">, algorithm: Algorithm = "alphabeta"): Position {
+    public determineCPUMove(difficulty: Omit<PlayerType, "human">): Position {
         const { emptyCells } = this.board;
         const randomMove = emptyCells[Math.floor(Math.random() * emptyCells.length)]!;
 
         switch (difficulty) {
             case "impossibleCPU":
-                return this.findOptimalMove({ algorithm, maxDepth: 9 });
+                return this.findOptimalMove({ maxDepth: 10 });
             case "hardCPU":
-                return this.findOptimalMove({ algorithm, maxDepth: 7 });
+                return this.findOptimalMove({ maxDepth: 7 });
             case "mediumCPU":
-                return this.findOptimalMove({ algorithm, maxDepth: 5 });
+                return this.findOptimalMove({ maxDepth: 5 });
             case "easyCPU":
                 return randomMove;
             default:
@@ -69,16 +68,13 @@ export default class Connect4 extends Base<Board> {
     /**
      * Finds the optimal move for the current board state.
      * @param options - The options for the algorithm.
-     * @param options.algorithm - The algorithm to use.
      * @param options.maxDepth - The maximum depth to search.
      * @returns The optimal move for the current board state.
      * @throws {Error} An error if the algorithm is invalid.
      */
-    public findOptimalMove(options?: { algorithm?: Algorithm; maxDepth?: number; }): Position {
-        const { maxDepth = Infinity, algorithm = "alphabeta" } = options ?? {};
-
+    public findOptimalMove({ maxDepth }: { maxDepth: number; } = { maxDepth: Infinity }): Position {
         return this.board.isEmpty
             ? { x: 3, y: 5 }
-            : this[algorithm](maxDepth).move;
+            : this.alphabeta(maxDepth).move;
     }
 }

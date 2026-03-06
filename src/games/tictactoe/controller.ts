@@ -1,5 +1,5 @@
-import type { Algorithm, GameConstructorOptions, PlayerType } from "../../base/controller.js";
 import Base, { Game } from "../../base/controller.js";
+import type { GameConstructorOptions, PlayerType } from "../../base/controller.js";
 import Board from "./board.js";
 import type { Position } from "../../base/board.js";
 
@@ -44,14 +44,13 @@ export default class TicTacToe extends Base<Board> {
     /**
      * Calculates the CPU's move.
      * @param difficulty - The difficulty of the CPU.
-     * @param algorithm - The algorithm to use.
      * @returns The CPU's move.
      * @throws {Error} An error if the difficulty is invalid.
      */
-    public determineCPUMove(difficulty: Omit<PlayerType, "human">, algorithm: Algorithm = "alphabeta"): Position {
+    public determineCPUMove(difficulty: Omit<PlayerType, "human">): Position {
         const { emptyCells } = this.board;
         const randomMove = emptyCells[Math.floor(Math.random() * emptyCells.length)]!;
-        const optimalMove = this.findOptimalMove({ algorithm, randomMove });
+        const optimalMove = this.findOptimalMove({ randomMove });
 
         switch (difficulty) {
             case "impossibleCPU":
@@ -70,17 +69,15 @@ export default class TicTacToe extends Base<Board> {
     /**
      * Finds the optimal move for the current player.
      * @param algorithm - The algorithm to use.
-     * @param algorithm.algorithm - The algorithm to use.
      * @param algorithm.randomMove - The move to return if the board is empty.
      * @returns The optimal move for the current player.
      * @throws {Error} An error if the algorithm is invalid.
      */
-    public findOptimalMove({ algorithm, randomMove }: {
-        algorithm: Algorithm;
+    public findOptimalMove({ randomMove }: {
         randomMove: Position;
-    } = { algorithm: "alphabeta", randomMove: { x: 2, y: 2 } }): Position {
+    } = { randomMove: { x: 2, y: 2 } }): Position {
         return this.board.isEmpty
             ? randomMove
-            : this[algorithm]().move;
+            : this.alphabeta().move;
     }
 }

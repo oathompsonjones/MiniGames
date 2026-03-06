@@ -7,7 +7,6 @@ export type { default as Connect4Board } from "./games/connect4/board.js";
 export type {
     default as Controller,
     PlayerType,
-    Algorithm,
     GameConstructorOptions,
     GameConstructor,
 } from "./base/controller.js";

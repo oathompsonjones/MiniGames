@@ -4,10 +4,6 @@ import type LongInt from "../bitBoard/longInt.js";
 import type { Position } from "./board.js";
 
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
-export type Algorithm = "alphabeta" | "minimax";
-
-/** Entry stored in the alpha-beta transposition table. */
-type TTEntry = { depth: number; flag: "exact" | "lower" | "upper"; score: number; };
 
 export type GameConstructorOptions<T extends Board<LongInt | number>> = {
     onEnd?: (winner: number | null) => Promise<void> | void;
@@ -48,6 +44,9 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
     /** Contains the ID of the current player. */
     private currentPlayerId: number = 0;
 
+    /** Stores precomputed values to optimise minimax/alphabeta. */
+    private readonly cache = new Map<string, { move: Position; score: number; }>();
+
     /**
      * Creates an instance of Controller.
      * @param playerTypes - The types of player for the game.
@@ -86,113 +85,37 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
 
     /**
      * Controls the main game flow.
-     * @param algorithm - The algorithm to use.
      * @returns The winner or null in the event of a tie.
      */
-    public async play(algorithm: Algorithm = "alphabeta"): Promise<void> {
+    public async play(): Promise<void> {
         await this.render();
         this.on("input", (async (move: Position): Promise<void> => {
             await this.makeMove(move);
 
             if (this.currentPlayer.playerType !== "human")
-                await this.makeMove(algorithm);
+                await this.makeMove();
         }) as (move: Position) => void);
 
         while (this.currentPlayer.playerType !== "human" && this.board.winner === false)
             // eslint-disable-next-line no-await-in-loop
-            await this.makeMove(algorithm);
-    }
-
-    /**
-     * The bog standard minimax algorithm. Left in for reference (https://en.wikipedia.org/wiki/Minimax).
-     * @param depth - The depth of the algorithm.
-     * @param maximisingPlayer - Whether or not the current player is the maximising player.
-     * @returns The optimal move.
-     */
-    protected minimax(depth: number = Infinity, maximisingPlayer: boolean = true): { move: Position; score: number; } {
-        const playerIds = [(this.currentPlayerId + 1) % 2, this.currentPlayerId] as const;
-
-        if (depth === 0 || this.board.winner !== false) {
-            return {
-                move: { x: NaN, y: NaN },
-                score: this.board.heuristic * (this.currentPlayerId === 0 ? 1 : -1),
-            };
-        }
-
-        let bestMove: ReturnType<typeof this.minimax> = {
-            move: { x: NaN, y: NaN },
-            score: maximisingPlayer ? -Infinity : Infinity,
-        };
-        const { emptyCells } = this.board;
-
-        for (const move of emptyCells) {
-            this.board.makeMove(move, playerIds[Number(maximisingPlayer)]!);
-            const { score } = this.minimax(depth - 1, !maximisingPlayer);
-
-            this.board.undoLastMove();
-
-            if (maximisingPlayer) {
-                const bestScore = Math.max(score, bestMove.score);
-
-                if (bestScore !== bestMove.score)
-                    bestMove = { move, score };
-            } else {
-                const bestScore = Math.min(score, bestMove.score);
-
-                if (bestScore !== bestMove.score)
-                    bestMove = { move, score };
-            }
-        }
-
-        return bestMove;
+            await this.makeMove();
     }
 
     /**
      * The minimax algorithm with alpha-beta pruning (https://en.wikipedia.org/wiki/Minimax).
-     *
-     * A transposition table (TT) is passed through all recursive calls so that
-     * identical board positions reached via different move orderings are not
-     * re-evaluated. The TT is created fresh on the root call (default parameter)
-     * and shared by every child, so each call to `findOptimalMove` starts clean.
-     *
-     * Each TT entry stores the score, the remaining depth when it was computed
-     * (deeper = more reliable), and a flag indicating whether the score is exact,
-     * a lower bound (beta cut-off), or an upper bound (never exceeded alpha).
      * @param depth - The depth of the algorithm.
      * @param alpha - The bounds for the alpha-beta variation of the algorithm.
      * @param beta - The bounds for the alpha-beta variation of the algorithm.
      * @param maximisingPlayer - Whether or not the current player is the maximising player.
-     * @param cache - The transposition table shared across the whole search.
      * @returns The optimal move.
      */
-    // eslint-disable-next-line max-statements
     protected alphabeta(
         depth: number = Infinity,
         alpha: number = -Infinity,
         beta: number = Infinity,
         maximisingPlayer: boolean = true,
-        cache: Map<string, TTEntry> = new Map<string, TTEntry>(),
     ): { move: Position; score: number; } {
         const playerIds = [(this.currentPlayerId + 1) % 2, this.currentPlayerId];
-        const originalAlpha = alpha;
-
-        const key = `${this.board.hashKey}:${Number(maximisingPlayer)}`;
-        const cached = cache.get(key);
-
-        if (cached !== undefined && cached.depth >= depth) {
-            if (cached.flag === "exact")
-                return { move: { x: NaN, y: NaN }, score: cached.score };
-
-            if (cached.flag === "lower")
-                // eslint-disable-next-line no-param-reassign
-                alpha = Math.max(alpha, cached.score);
-            else
-                // eslint-disable-next-line no-param-reassign
-                beta = Math.min(beta, cached.score);
-
-            if (alpha >= beta)
-                return { move: { x: NaN, y: NaN }, score: cached.score };
-        }
 
         if (depth === 0 || this.board.winner !== false) {
             return {
@@ -201,7 +124,10 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
             };
         }
 
-        let bestMove: ReturnType<typeof this.alphabeta> = {
+        if (this.cache.has(this.board.toString()))
+            return this.cache.get(this.board.toString())!;
+
+        let bestMove = {
             move: { x: NaN, y: NaN },
             score: maximisingPlayer ? -Infinity : Infinity,
         };
@@ -209,7 +135,7 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
 
         for (const move of emptyCells) {
             this.board.makeMove(move, playerIds[Number(maximisingPlayer)]!);
-            const { score } = this.alphabeta(depth - 1, alpha, beta, !maximisingPlayer, cache);
+            const { score } = this.alphabeta(depth - 1, alpha, beta, !maximisingPlayer);
 
             this.board.undoLastMove();
 
@@ -238,17 +164,7 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
             }
         }
 
-        // Store in the transposition table with the appropriate bound flag.
-        let flag: "exact" | "lower" | "upper";
-
-        if (bestMove.score <= originalAlpha)
-            flag = "upper";
-        else if (bestMove.score >= beta)
-            flag = "lower";
-        else
-            flag = "exact";
-
-        cache.set(key, { depth, flag, score: bestMove.score });
+        this.cache.set(this.board.toString(), bestMove);
 
         return bestMove;
     }
@@ -260,10 +176,10 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
 
     /**
      * Makes a move.
-     * @param input - Either the algorithm to use to calculate the move or the move itself.
+     * @param input - The move to make. If ommitted, the move will be calculated for the CPU.
      */
-    private async makeMove(input: Algorithm | Position): Promise<void> {
-        if (typeof input === "string") {
+    private async makeMove(input?: Position): Promise<void> {
+        if (input === undefined) {
             this.board.makeMove(this.determineCPUMove(this.currentPlayer.playerType, input), this.currentPlayer.id);
         } else {
             if (this.currentPlayer.playerType !== "human" || !this.board.moveIsValid(input)) {
@@ -298,13 +214,11 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
     /**
      * Finds the optimal move.
      * @param options - The options to use.
-     * @param options.algorithm - The algorithm to use.
      * @param options.maxDepth - The maximum depth to search.
      * @param options.randomMove - A random move to make.
      * @returns The optimal move to make.
      */
     public abstract findOptimalMove(options?: {
-        algorithm?: Algorithm;
         maxDepth?: number;
         randomMove?: Position;
     }): Position;
