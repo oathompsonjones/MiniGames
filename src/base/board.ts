@@ -40,6 +40,12 @@ export default abstract class Board<T extends LongInt | number> {
     /** A stack of moves. */
     protected readonly moves: number[] = [];
 
+    /**
+     * Cached result of the last `winner` computation.
+     * Set to `undefined` whenever the board changes so the getter recomputes.
+     */
+    private _cachedWinner: 0 | 1 | false | null | undefined = undefined;
+
     /** How many boards there are representing player positions (most likely 2). */
     private readonly numberOfPlayerBoards: number;
 
@@ -109,21 +115,40 @@ export default abstract class Board<T extends LongInt | number> {
      * @returns `false` if the game is not over, the player ID if there is a winner, and `null` if there is a draw.
      */
     public get winner(): 0 | 1 | false | null {
+        if (this._cachedWinner !== undefined)
+            return this._cachedWinner;
+
         const playerOneBoard = this.getPlayerBoard(0);
         const playerTwoBoard = this.getPlayerBoard(1);
 
         for (const state of this.winningStates) {
-            if (playerOneBoard.and(state).equals(state))
-                return 0;
+            if (playerOneBoard.and(state).equals(state)) {
+                this._cachedWinner = 0;
 
-            if (playerTwoBoard.and(state).equals(state))
+                return 0;
+            }
+
+            if (playerTwoBoard.and(state).equals(state)) {
+                this._cachedWinner = 1;
+
                 return 1;
+            }
         }
 
-        if (this.isFull)
-            return null;
+        this._cachedWinner = this.isFull ? null : false;
 
-        return false;
+        return this._cachedWinner;
+    }
+
+    /**
+     * Returns a compact string key uniquely identifying the current board state.
+     * Used as a key in the alpha-beta transposition table.
+     * @returns The unique board state key.
+     */
+    public get hashKey(): string {
+        const { data } = this.bitBoard;
+
+        return data instanceof LongInt ? data.data.join(",") : String(data);
     }
 
     /**
@@ -152,6 +177,7 @@ export default abstract class Board<T extends LongInt | number> {
      * @param playerId - The player who's making the move.
      */
     public makeMove(move: Position, playerId: number): void {
+        this._cachedWinner = undefined;
         const bit = this.getBitIndex(move, playerId);
 
         this.moves.push(bit);
@@ -163,6 +189,7 @@ export default abstract class Board<T extends LongInt | number> {
      * @throws {Error} - If there is no move to undo.
      */
     public undoLastMove(): void {
+        this._cachedWinner = undefined;
         const lastMove = this.moves.pop();
 
         if (lastMove === undefined)
@@ -272,60 +299,6 @@ export default abstract class Board<T extends LongInt | number> {
         }
 
         return `${xLabels}${topBorder}${rows.join(rowSeparator)}${bottomBorder}`;
-    }
-
-    /**
-     * Determines if a given player has a line of pieces on the board.
-     * @param playerId - The ID of the player to check.
-     * @param length - The number of pieces needed.
-     * @param maxGaps - The number of gaps allowed for a line to be valid. Defaults to 0.
-     * @returns How many lines exist.
-     */
-    public hasLine(playerId: number, length: number, maxGaps: number = 0): number {
-        if (length > Math.max(this.width, this.height))
-            return 0;
-
-        const DIRECTIONS: [Position, Position, Position, Position] = [
-            { x: 1, y: 0 },
-            { x: 0, y: 1 },
-            { x: 1, y: 1 },
-            { x: 1, y: -1 },
-        ];
-        let lineCount = 0;
-        let gaps: [number, number, number, number] = [0, 0, 0, 0];
-        let lengths: [number, number, number, number] = [0, 0, 0, 0];
-        const checkCell = (x: number, y: number, direction: 0 | 1 | 2 | 3): void => {
-            const cell = { x, y } as Position;
-
-            if (this.isValidPosition(cell)) {
-                const cellOccupier = this.cellOccupier(cell);
-
-                if (cellOccupier === null)
-                    gaps[direction]++;
-                else if (cellOccupier === playerId)
-                    lengths[direction]++;
-            }
-        };
-
-        for (let x = 0; x < this.width; x++) {
-            for (let y = 0; y < this.height; y++) {
-                gaps = [0, 0, 0, 0];
-                lengths = [0, 0, 0, 0];
-                for (let i = 0; i < length; i++) {
-                    for (let j = 0 as 0 | 1 | 2 | 3; j < 4; j++) {
-                        if (gaps[j] > maxGaps)
-                            continue;
-
-                        checkCell(x + i * DIRECTIONS[j].x, y + i * DIRECTIONS[j].y, j);
-
-                        if (lengths[j] === length)
-                            lineCount++;
-                    }
-                }
-            }
-        }
-
-        return lineCount;
     }
 
     /**

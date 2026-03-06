@@ -79,11 +79,8 @@ export default class TicTacToe extends Base<Board> {
         algorithm: Algorithm;
         randomMove: Position;
     } = { algorithm: "alphabeta", randomMove: { x: 2, y: 2 } }): Position {
-        if (this.board.isEmpty)
-            return randomMove;
-
-        const minimax = this[algorithm]();
-
-        return minimax.move;
+        return this.board.isEmpty
+            ? randomMove
+            : this[algorithm]().move;
     }
 }

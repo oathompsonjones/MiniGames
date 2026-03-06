@@ -19,10 +19,10 @@ export default class Board extends Base<number> {
         const { winner } = this;
 
         if (winner === 0)
-            return 1;
+            return 10 - this.moves.length;
 
         if (winner === 1)
-            return -1;
+            return -(10 - this.moves.length);
 
         return 0;
     }

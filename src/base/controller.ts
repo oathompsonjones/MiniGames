@@ -5,6 +5,10 @@ import type { Position } from "./board.js";
 
 export type PlayerType = "easyCPU" | "hardCPU" | "human" | "impossibleCPU" | "mediumCPU";
 export type Algorithm = "alphabeta" | "minimax";
+
+/** Entry stored in the alpha-beta transposition table. */
+type TTEntry = { depth: number; flag: "exact" | "lower" | "upper"; score: number; };
+
 export type GameConstructorOptions<T extends Board<LongInt | number>> = {
     onEnd?: (winner: number | null) => Promise<void> | void;
     onInvalidInput?: (position: Position) => Promise<void> | void;
@@ -123,7 +127,7 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
 
         for (const move of emptyCells) {
             this.board.makeMove(move, playerIds[Number(maximisingPlayer)]!);
-            const score = (9 - emptyCells.length) * this.minimax(depth - 1, !maximisingPlayer).score;
+            const { score } = this.minimax(depth - 1, !maximisingPlayer);
 
             this.board.undoLastMove();
 
@@ -145,19 +149,50 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
 
     /**
      * The minimax algorithm with alpha-beta pruning (https://en.wikipedia.org/wiki/Minimax).
+     *
+     * A transposition table (TT) is passed through all recursive calls so that
+     * identical board positions reached via different move orderings are not
+     * re-evaluated. The TT is created fresh on the root call (default parameter)
+     * and shared by every child, so each call to `findOptimalMove` starts clean.
+     *
+     * Each TT entry stores the score, the remaining depth when it was computed
+     * (deeper = more reliable), and a flag indicating whether the score is exact,
+     * a lower bound (beta cut-off), or an upper bound (never exceeded alpha).
      * @param depth - The depth of the algorithm.
      * @param alpha - The bounds for the alpha-beta variation of the algorithm.
      * @param beta - The bounds for the alpha-beta variation of the algorithm.
      * @param maximisingPlayer - Whether or not the current player is the maximising player.
+     * @param cache - The transposition table shared across the whole search.
      * @returns The optimal move.
      */
+    // eslint-disable-next-line max-statements
     protected alphabeta(
         depth: number = Infinity,
         alpha: number = -Infinity,
         beta: number = Infinity,
         maximisingPlayer: boolean = true,
+        cache: Map<string, TTEntry> = new Map<string, TTEntry>(),
     ): { move: Position; score: number; } {
-        const playerIds = [(this.currentPlayerId + 1) % 2, this.currentPlayerId] as const;
+        const playerIds = [(this.currentPlayerId + 1) % 2, this.currentPlayerId];
+        const originalAlpha = alpha;
+
+        const key = `${this.board.hashKey}:${Number(maximisingPlayer)}`;
+        const cached = cache.get(key);
+
+        if (cached !== undefined && cached.depth >= depth) {
+            if (cached.flag === "exact")
+                return { move: { x: NaN, y: NaN }, score: cached.score };
+
+            if (cached.flag === "lower")
+                // eslint-disable-next-line no-param-reassign
+                alpha = Math.max(alpha, cached.score);
+            else
+                // eslint-disable-next-line no-param-reassign
+                beta = Math.min(beta, cached.score);
+
+            if (alpha >= beta)
+                return { move: { x: NaN, y: NaN }, score: cached.score };
+        }
 
         if (depth === 0 || this.board.winner !== false) {
             return {
@@ -174,7 +209,7 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
 
         for (const move of emptyCells) {
             this.board.makeMove(move, playerIds[Number(maximisingPlayer)]!);
-            const score = (9 - emptyCells.length) * this.alphabeta(depth - 1, alpha, beta, !maximisingPlayer).score;
+            const { score } = this.alphabeta(depth - 1, alpha, beta, !maximisingPlayer, cache);
 
             this.board.undoLastMove();
 
@@ -202,6 +237,18 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
                 beta = Math.min(beta, bestScore);
             }
         }
+
+        // Store in the transposition table with the appropriate bound flag.
+        let flag: "exact" | "lower" | "upper";
+
+        if (bestMove.score <= originalAlpha)
+            flag = "upper";
+        else if (bestMove.score >= beta)
+            flag = "lower";
+        else
+            flag = "exact";
+
+        cache.set(key, { depth, flag, score: bestMove.score });
 
         return bestMove;
     }

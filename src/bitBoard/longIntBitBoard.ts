@@ -60,10 +60,7 @@ export default class LongIntBitBoard extends BitBoard<LongInt> {
      * @param bit - The bit to set.
      */
     public setBit(bit: number): void {
-        const mask = LongInt.getMatchingLongInt(this._data, 1)
-            .leftShift(bit);
-
-        this._data.or(mask);
+        this._data.or(LongInt.getMatchingLongInt(this._data, 1).leftShift(bit));
     }
 
     /**
@@ -71,11 +68,7 @@ export default class LongIntBitBoard extends BitBoard<LongInt> {
      * @param bit - The bit to clear.
      */
     public clearBit(bit: number): void {
-        const mask = LongInt.getMatchingLongInt(this._data, 1)
-            .leftShift(bit)
-            .not();
-
-        this._data.and(mask);
+        this._data.and(LongInt.getMatchingLongInt(this._data, 1).leftShift(bit).not());
     }
 
     /**
@@ -83,10 +76,7 @@ export default class LongIntBitBoard extends BitBoard<LongInt> {
      * @param bit - The bit to toggle.
      */
     public toggleBit(bit: number): void {
-        const mask = LongInt.getMatchingLongInt(this._data, 1)
-            .leftShift(bit);
-
-        this._data.xor(mask);
+        this._data.xor(LongInt.getMatchingLongInt(this._data, 1).leftShift(bit));
     }
 
     /** Sets all bits to 0. */

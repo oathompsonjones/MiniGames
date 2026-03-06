@@ -165,9 +165,19 @@ export default class LongInt {
      * @returns The new value of this & right.
      */
     public and(right: LongInt | number): this {
-        const rightLongInt = this.getMatchingLongInt(right);
+        if (typeof right === "number") {
+            this.data[0]! &= right;
 
-        for (let i = 0; i < this.data.length; i++)
+            for (let i = 1; i < this.data.length; i++)
+                this.data[i] = 0;
+
+            return this;
+        }
+
+        const rightLongInt = this.getMatchingLongInt(right);
+        const { length } = this.data;
+
+        for (let i = 0; i < length; i++)
             this.data[i]! &= rightLongInt.data[i]!;
 
         return this;
@@ -179,9 +189,16 @@ export default class LongInt {
      * @returns The new value of this | right.
      */
     public or(right: LongInt | number): this {
-        const rightLongInt = this.getMatchingLongInt(right);
+        if (typeof right === "number") {
+            this.data[0]! |= right;
 
-        for (let i = 0; i < this.data.length; i++)
+            return this;
+        }
+
+        const rightLongInt = this.getMatchingLongInt(right);
+        const { length } = this.data;
+
+        for (let i = 0; i < length; i++)
             this.data[i]! |= rightLongInt.data[i]!;
 
         return this;
@@ -193,9 +210,16 @@ export default class LongInt {
      * @returns The new value of this ^ right.
      */
     public xor(right: LongInt | number): this {
-        const rightLongInt = this.getMatchingLongInt(right);
+        if (typeof right === "number") {
+            this.data[0]! ^= right;
 
-        for (let i = 0; i < this.data.length; i++)
+            return this;
+        }
+
+        const rightLongInt = this.getMatchingLongInt(right);
+        const { length } = this.data;
+
+        for (let i = 0; i < length; i++)
             this.data[i]! ^= rightLongInt.data[i]!;
 
         return this;
@@ -221,14 +245,17 @@ export default class LongInt {
         if (shiftAmount === 0)
             return this;
 
-        if (shiftAmount > 31)
-            this.shiftArrayRight(Math.floor(shiftAmount / 32));
+        const wordShiftAmount = shiftAmount >>> 5;
+        const singleShiftAmount = shiftAmount & 31;
 
-        if (shiftAmount !== 32) {
-            const singleShiftAmount = shiftAmount % 32;
+        if (wordShiftAmount > 0)
+            this.shiftArrayRight(wordShiftAmount);
+
+        if (singleShiftAmount !== 0) {
+            const inverseShiftAmount = 32 - singleShiftAmount;
 
             for (let i = this.data.length - 1; i >= 0; i--)
-                this.data[i] = this.data[i]! << singleShiftAmount | this.data[i - 1]! >>> 32 - singleShiftAmount;
+                this.data[i] = this.data[i]! << singleShiftAmount | this.data[i - 1]! >>> inverseShiftAmount;
         }
 
         return this;
@@ -243,15 +270,18 @@ export default class LongInt {
         if (shiftAmount === 0)
             return this;
 
-        if (shiftAmount !== 32) {
-            const singleShiftAmount = shiftAmount % 32;
+        const wordShiftAmount = shiftAmount >>> 5;
+        const singleShiftAmount = shiftAmount & 31;
+
+        if (singleShiftAmount !== 0) {
+            const inverseShiftAmount = 32 - singleShiftAmount;
 
             for (let i = 0; i < this.data.length; i++)
-                this.data[i] = this.data[i]! >>> singleShiftAmount | this.data[i + 1]! << 32 - singleShiftAmount;
+                this.data[i] = this.data[i]! >>> singleShiftAmount | this.data[i + 1]! << inverseShiftAmount;
         }
 
-        if (shiftAmount > 31)
-            this.shiftArrayLeft(Math.floor(shiftAmount / 32));
+        if (wordShiftAmount > 0)
+            this.shiftArrayLeft(wordShiftAmount);
 
         return this;
     }
@@ -265,15 +295,18 @@ export default class LongInt {
         if (shiftAmount === 0)
             return this;
 
-        if (shiftAmount !== 32) {
-            const singleShiftAmount = shiftAmount % 32;
+        const wordShiftAmount = shiftAmount >>> 5;
+        const singleShiftAmount = shiftAmount & 31;
+
+        if (singleShiftAmount !== 0) {
+            const inverseShiftAmount = 32 - singleShiftAmount;
 
             for (let i = 0; i < this.data.length; i++)
-                this.data[i] = this.data[i]! >> singleShiftAmount | this.data[i + 1]! << 32 - singleShiftAmount;
+                this.data[i] = this.data[i]! >> singleShiftAmount | this.data[i + 1]! << inverseShiftAmount;
         }
 
-        if (shiftAmount > 31)
-            this.shiftArrayLeft(Math.floor(shiftAmount / 32), ~0 >>> 0);
+        if (wordShiftAmount > 0)
+            this.shiftArrayLeft(wordShiftAmount, ~0 >>> 0);
 
         return this;
     }
@@ -284,13 +317,25 @@ export default class LongInt {
      * @returns Whether or not they are equal.
      */
     public equals(value: LongInt | number): boolean {
-        const longInt = value instanceof LongInt ? value : new LongInt([value]);
-        const longestLongInt = this.data.length > longInt.data.length ? this : longInt;
-        const longInt1 = LongInt.getMatchingLongInt(longestLongInt, this);
-        const longInt2 = LongInt.getMatchingLongInt(longestLongInt, longInt);
+        const leftData = this.data;
 
-        for (let i = 0; i < longestLongInt.data.length; i++) {
-            if (longInt1.data[i] !== longInt2.data[i])
+        if (value instanceof LongInt) {
+            const rightData = value.data;
+            const maxLength = leftData.length > rightData.length ? leftData.length : rightData.length;
+
+            for (let i = 0; i < maxLength; i++) {
+                if ((leftData[i] ?? 0) !== (rightData[i] ?? 0))
+                    return false;
+            }
+
+            return true;
+        }
+
+        if ((leftData[0] ?? 0) !== value >>> 0)
+            return false;
+
+        for (let i = 1; i < leftData.length; i++) {
+            if (leftData[i] !== 0)
                 return false;
         }
 
@@ -317,10 +362,12 @@ export default class LongInt {
                 break;
         }
 
-        return [...this.data]
-            .reverse()
-            .map((num) => num.toString(type).padStart(padLength, "0"))
-            .join(" ");
+        const strings = new Array<string>(this.data.length);
+
+        for (let i = this.data.length - 1, j = 0; i >= 0; i--, j++)
+            strings[j] = this.data[i]!.toString(type).padStart(padLength, "0");
+
+        return strings.join(" ");
     }
 
     /**
@@ -353,42 +400,33 @@ export default class LongInt {
      * @returns The new LongInt.
      */
     private getMatchingLongInt(value: LongInt | number[] | Uint32Array | number = 0): LongInt {
-        let integers: number[] | Uint32Array = [];
+        const longInt = new LongInt(this.data.length);
+        const { data } = longInt;
 
-        switch (true) {
-            case value instanceof Uint32Array:
-                if (value.length < this.data.length)
-                    integers = [...value, ...Array<number>(this.data.length - value.length).fill(0)];
-                else if (value.length > this.data.length)
-                    integers = value.slice(0, this.data.length);
-                else
-                    integers = value;
+        if (value instanceof LongInt) {
+            data.set(value.data.subarray(0, data.length));
 
-                break;
-            case value instanceof LongInt:
-                if (value.data.length < this.data.length)
-                    integers = [...value.data, ...Array<number>(this.data.length - value.data.length).fill(0)];
-                else if (value.data.length > this.data.length)
-                    integers = value.data.slice(0, this.data.length);
-                else
-                    integers = value.data;
-
-                break;
-            case value instanceof Array:
-                if (value.length < this.data.length)
-                    integers = [...value, ...Array<number>(this.data.length - value.length).fill(0)];
-                else if (value.length > this.data.length)
-                    integers = value.slice(0, this.data.length);
-                else
-                    integers = value;
-
-                break;
-            default:
-                integers = [value, ...Array<number>(this.data.length - 1).fill(0)];
-                break;
+            return longInt;
         }
 
-        return new LongInt(integers);
+        if (value instanceof Uint32Array) {
+            data.set(value.subarray(0, data.length));
+
+            return longInt;
+        }
+
+        if (Array.isArray(value)) {
+            const copyLength = value.length < data.length ? value.length : data.length;
+
+            for (let i = 0; i < copyLength; i++)
+                data[i] = value[i]!;
+
+            return longInt;
+        }
+
+        data[0] = value;
+
+        return longInt;
     }
 
     /**
@@ -400,6 +438,15 @@ export default class LongInt {
     private shiftArrayRight(count: number, fillValue: number = 0): this {
         if (count < 0)
             return this.shiftArrayLeft(-count, fillValue);
+
+        if (count === 0)
+            return this;
+
+        if (count >= this.data.length) {
+            this.data.fill(fillValue);
+
+            return this;
+        }
 
         for (let i = this.data.length - 1; i >= 0; i--)
             this.data[i] = this.data[i - count] ?? fillValue;
@@ -416,6 +463,15 @@ export default class LongInt {
     private shiftArrayLeft(count: number, fillValue: number = 0): this {
         if (count < 0)
             return this.shiftArrayRight(-count, fillValue);
+
+        if (count === 0)
+            return this;
+
+        if (count >= this.data.length) {
+            this.data.fill(fillValue);
+
+            return this;
+        }
 
         for (let i = 0; i < this.data.length; i++)
             this.data[i] = this.data[i + count] ?? fillValue;

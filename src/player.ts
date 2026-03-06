@@ -109,8 +109,8 @@ async function getPlayerCount(): Promise<number> {
  * @param playerCount - The number of players.
  * @returns The difficulty of the CPU player.
  */
-async function getDifficulty(playerCount: number): Promise<PlayerType | undefined> {
-    return playerCount === 1
+async function getDifficulty(playerCount: number): Promise<PlayerType> {
+    return playerCount < 2
         ? getValidInput(
             (value) => value !== undefined,
             (inputString) => ([
@@ -126,7 +126,7 @@ async function getDifficulty(playerCount: number): Promise<PlayerType | undefine
             "4. Impossible",
             "",
         )
-        : undefined;
+        : "human";
 }
 
 /**
@@ -156,7 +156,8 @@ async function getInput(
         : { x: testedInput[1]!.toUpperCase().charCodeAt(0) - 65, y: Number(testedInput[2]) - 1 };
 }
 
-await (async function main(): Promise<void> {
+/** The main function to run the game loop. */
+async function main(): Promise<void> {
     console.clear();
     const start = await readLine("Would you like to play a game? (Y/N) ");
 
@@ -165,10 +166,10 @@ await (async function main(): Promise<void> {
 
     const gameObject = await getGame();
     const playerCount = await getPlayerCount();
-    const difficulty: PlayerType | undefined = await getDifficulty(playerCount);
+    const difficulty: PlayerType = await getDifficulty(playerCount);
 
-    const playerOneType = playerCount > 0 ? "human" : "impossibleCPU";
-    const playerTwoType = playerCount > 1 ? "human" : difficulty ?? "impossibleCPU";
+    const playerOneType = playerCount > 0 ? "human" : difficulty;
+    const playerTwoType = playerCount > 1 ? "human" : difficulty;
 
     let gameOver = false;
     const game = new gameObject.Game(playerOneType, playerTwoType);
@@ -190,4 +191,13 @@ await (async function main(): Promise<void> {
     await readLine("");
 
     await main();
-})();
+}
+
+try {
+    await main();
+} catch (error) {
+    if (error instanceof Error && error.message === "Aborted with Ctrl+C")
+        console.clear();
+    else
+        console.error(error);
+}

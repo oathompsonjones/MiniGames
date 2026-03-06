@@ -24,9 +24,7 @@ export default class IntBitBoard extends BitBoard<number> {
      * @param bit - The bit to set.
      */
     public setBit(bit: number): void {
-        const mask = 1 << bit;
-
-        this._data |= mask;
+        this._data |= 1 << bit;
     }
 
     /**
@@ -34,9 +32,7 @@ export default class IntBitBoard extends BitBoard<number> {
      * @param bit - The bit to clear.
      */
     public clearBit(bit: number): void {
-        const mask = ~(1 << bit);
-
-        this._data &= mask;
+        this._data &= ~(1 << bit);
     }
 
     /**
@@ -44,9 +40,7 @@ export default class IntBitBoard extends BitBoard<number> {
      * @param bit - The bit to toggle.
      */
     public toggleBit(bit: number): void {
-        const mask = 1 << bit;
-
-        this._data ^= mask;
+        this._data ^= 1 << bit;
     }
 
     /** Sets all bits to 0. */
