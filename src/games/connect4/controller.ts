@@ -10,7 +10,7 @@ import type { Position } from "../../base/board.js";
 function defaultRender(controller: Connect4): void {
     /* eslint-disable no-console */
     console.clear();
-    console.log(controller.board.toString(true, true, false, ["⬤", "⬤"]));
+    console.log(controller.board.toString(true, true, false, ["⬤ ", "⬤ "]));
     const { winner } = controller.board;
 
     if (winner !== false)
