@@ -75,9 +75,7 @@ export default class Board extends Base<LongInt> {
         let p0Score = 0;
         let p1Score = 0;
 
-        // Scoring: defensive moves (blocking) weighted 1.5x higher than offensive moves
-        const offensiveScores = [0, 1, 10, 100];
-        const defensiveScores = [0, 1.5, 15, 150];
+        const scores = [0, 1, 10, 100];
 
         // Horizontal →
         for (let y = 0; y < this.height; y++) {
@@ -93,9 +91,9 @@ export default class Board extends Base<LongInt> {
                 const p1Count = window.filter((occupier) => occupier === 1).length;
 
                 if (p0Count > 0 && p1Count === 0)
-                    p0Score += defensiveScores[p0Count]!;
+                    p0Score += scores[p0Count]!;
                 else if (p1Count > 0 && p0Count === 0)
-                    p1Score += offensiveScores[p1Count]!;
+                    p1Score += scores[p1Count]!;
             }
         }
 
@@ -113,9 +111,9 @@ export default class Board extends Base<LongInt> {
                 const p1Count = window.filter((occupier) => occupier === 1).length;
 
                 if (p0Count > 0 && p1Count === 0)
-                    p0Score += defensiveScores[p0Count]!;
+                    p0Score += scores[p0Count]!;
                 else if (p1Count > 0 && p0Count === 0)
-                    p1Score += offensiveScores[p1Count]!;
+                    p1Score += scores[p1Count]!;
             }
         }
 
@@ -133,9 +131,9 @@ export default class Board extends Base<LongInt> {
                 const p1Count = window.filter((occupier) => occupier === 1).length;
 
                 if (p0Count > 0 && p1Count === 0)
-                    p0Score += defensiveScores[p0Count]!;
+                    p0Score += scores[p0Count]!;
                 else if (p1Count > 0 && p0Count === 0)
-                    p1Score += offensiveScores[p1Count]!;
+                    p1Score += scores[p1Count]!;
             }
         }
 
@@ -153,9 +151,9 @@ export default class Board extends Base<LongInt> {
                 const p1Count = window.filter((occupier) => occupier === 1).length;
 
                 if (p0Count > 0 && p1Count === 0)
-                    p0Score += defensiveScores[p0Count]!;
+                    p0Score += scores[p0Count]!;
                 else if (p1Count > 0 && p0Count === 0)
-                    p1Score += offensiveScores[p1Count]!;
+                    p1Score += scores[p1Count]!;
             }
         }
 

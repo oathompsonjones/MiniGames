@@ -144,7 +144,7 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
         }
 
         if (depth === 0 || board.winner !== false) {
-            const score = board.heuristic * (this.currentPlayerId === 0 ? 1 : -1);
+            const score = board.heuristic * (playerId === 0 ? 1 : -1);
 
             this.transposition.set(hash, { depth, score });
 
