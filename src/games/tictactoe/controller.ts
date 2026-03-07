@@ -73,11 +73,9 @@ export default class TicTacToe extends Base<Board> {
      * @returns The optimal move for the current player.
      * @throws {Error} An error if the algorithm is invalid.
      */
-    public findOptimalMove({ randomMove }: {
-        randomMove: Position;
-    } = { randomMove: { x: 2, y: 2 } }): Position {
+    public findOptimalMove({ randomMove }: { randomMove: Position; } = { randomMove: { x: 2, y: 2 } }): Position {
         return this.board.isEmpty
             ? randomMove
-            : this.alphabeta().move;
+            : this.search(9).move;
     }
 }

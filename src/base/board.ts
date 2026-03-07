@@ -38,7 +38,7 @@ export default abstract class Board<T extends LongInt | number> {
     protected readonly height: number;
 
     /** A stack of moves. */
-    protected readonly moves: number[] = [];
+    protected readonly moves: Array<Position & { playerId: number; }> = [];
 
     /**
      * Cached result of the last `winner` computation.
@@ -51,6 +51,12 @@ export default abstract class Board<T extends LongInt | number> {
 
     /** Number of boards in total (most likely also 2). */
     private readonly numberOfBoards: number;
+
+    /** The zobrist hash table. */
+    private readonly zobrist: number[][][] = [];
+
+    /** The hash for the current board state. */
+    private _hash: number = 0;
 
     /** The board states which represent a winning state. */
     protected abstract readonly winningStates: Array<BitBoard<T>>;
@@ -72,6 +78,16 @@ export default abstract class Board<T extends LongInt | number> {
         this.bitBoard = (totalBits > 32
             ? new LongIntBitBoard(Math.ceil(totalBits / 32))
             : new IntBitBoard()) as BitBoard<T>;
+
+        for (let x = 0; x < width; x++) {
+            this.zobrist[x] = [];
+            for (let y = 0; y < height; y++) {
+                this.zobrist[x]![y] = [
+                    Math.floor(Math.random() * 0xFFFFFFFF),
+                    Math.floor(Math.random() * 0xFFFFFFFF),
+                ];
+            }
+        }
     }
 
     /**
@@ -141,14 +157,11 @@ export default abstract class Board<T extends LongInt | number> {
     }
 
     /**
-     * Returns a compact string key uniquely identifying the current board state.
-     * Used as a key in the alpha-beta transposition table.
+     * Gets a unique key representing the current board state.
      * @returns The unique board state key.
      */
-    public get hashKey(): string {
-        const { data } = this.bitBoard;
-
-        return data instanceof LongInt ? data.data.join(",") : String(data);
+    public get hash(): number {
+        return this._hash;
     }
 
     /**
@@ -180,8 +193,9 @@ export default abstract class Board<T extends LongInt | number> {
         this._cachedWinner = undefined;
         const bit = this.getBitIndex(move, playerId);
 
-        this.moves.push(bit);
+        this.moves.push({ ...move, playerId });
         this.bitBoard.setBit(bit);
+        this._hash ^= this.zobrist[move.x]![move.y]![playerId]!;
     }
 
     /**
@@ -195,7 +209,10 @@ export default abstract class Board<T extends LongInt | number> {
         if (lastMove === undefined)
             throw new Error("No move to undo.");
 
-        this.bitBoard.clearBit(lastMove);
+        const bit = this.getBitIndex(lastMove, lastMove.playerId);
+
+        this.bitBoard.clearBit(bit);
+        this._hash ^= this.zobrist[lastMove.x]![lastMove.y]![lastMove.playerId]!;
     }
 
     /**

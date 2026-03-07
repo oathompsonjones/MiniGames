@@ -75,6 +75,6 @@ export default class Connect4 extends Base<Board> {
     public findOptimalMove({ maxDepth }: { maxDepth: number; } = { maxDepth: Infinity }): Position {
         return this.board.isEmpty
             ? { x: 3, y: 5 }
-            : this.alphabeta(maxDepth).move;
+            : this.search(maxDepth).move;
     }
 }

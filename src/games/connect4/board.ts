@@ -59,6 +59,7 @@ export default class Board extends Base<LongInt> {
 
     /**
      * Calculates the heuristic score for the current board state.
+     * Favors blocking opponent's 3s over making own 3s.
      * @returns The heuristic score.
      */
     // eslint-disable-next-line max-statements
@@ -74,6 +75,10 @@ export default class Board extends Base<LongInt> {
         let p0Score = 0;
         let p1Score = 0;
 
+        // Scoring: defensive moves (blocking) weighted 1.5x higher than offensive moves
+        const offensiveScores = [0, 1, 10, 100];
+        const defensiveScores = [0, 1.5, 15, 150];
+
         // Horizontal →
         for (let y = 0; y < this.height; y++) {
             for (let x = 0; x < this.width - 3; x++) {
@@ -88,9 +93,9 @@ export default class Board extends Base<LongInt> {
                 const p1Count = window.filter((occupier) => occupier === 1).length;
 
                 if (p0Count > 0 && p1Count === 0)
-                    p0Score += [0, 1, 10, 100][p0Count]!;
+                    p0Score += defensiveScores[p0Count]!;
                 else if (p1Count > 0 && p0Count === 0)
-                    p1Score += [0, 1, 10, 100][p1Count]!;
+                    p1Score += offensiveScores[p1Count]!;
             }
         }
 
@@ -108,9 +113,9 @@ export default class Board extends Base<LongInt> {
                 const p1Count = window.filter((occupier) => occupier === 1).length;
 
                 if (p0Count > 0 && p1Count === 0)
-                    p0Score += [0, 1, 10, 100][p0Count]!;
+                    p0Score += defensiveScores[p0Count]!;
                 else if (p1Count > 0 && p0Count === 0)
-                    p1Score += [0, 1, 10, 100][p1Count]!;
+                    p1Score += offensiveScores[p1Count]!;
             }
         }
 
@@ -128,9 +133,9 @@ export default class Board extends Base<LongInt> {
                 const p1Count = window.filter((occupier) => occupier === 1).length;
 
                 if (p0Count > 0 && p1Count === 0)
-                    p0Score += [0, 1, 10, 100][p0Count]!;
+                    p0Score += defensiveScores[p0Count]!;
                 else if (p1Count > 0 && p0Count === 0)
-                    p1Score += [0, 1, 10, 100][p1Count]!;
+                    p1Score += offensiveScores[p1Count]!;
             }
         }
 
@@ -148,9 +153,9 @@ export default class Board extends Base<LongInt> {
                 const p1Count = window.filter((occupier) => occupier === 1).length;
 
                 if (p0Count > 0 && p1Count === 0)
-                    p0Score += [0, 1, 10, 100][p0Count]!;
+                    p0Score += defensiveScores[p0Count]!;
                 else if (p1Count > 0 && p0Count === 0)
-                    p1Score += [0, 1, 10, 100][p1Count]!;
+                    p1Score += offensiveScores[p1Count]!;
             }
         }
 
@@ -191,7 +196,7 @@ export default class Board extends Base<LongInt> {
      */
     public override undoLastMove(): void {
         // X-coordinate is recoverable from the bit index: bit % width = x.
-        const x = this.moves[this.moves.length - 1]! % this.width;
+        const { x } = (this.moves[this.moves.length - 1]!);
 
         super.undoLastMove();
         this.heights[x]!++;

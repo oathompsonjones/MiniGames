@@ -44,8 +44,11 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
     /** Contains the ID of the current player. */
     private currentPlayerId: number = 0;
 
-    /** Stores precomputed values to optimise minimax/alphabeta. */
-    private readonly cache = new Map<string, { move: Position; score: number; }>();
+    /** Contains the transposition table for the minimax algorithm. */
+    private readonly transposition = new Map<number, { depth: number; score: number; }>();
+
+    /** Contains the best moves for the minimax algorithm. */
+    private readonly bestMoves = new Map<number, Position>();
 
     /**
      * Creates an instance of Controller.
@@ -102,71 +105,109 @@ export default abstract class Controller<T extends Board<LongInt | number>> exte
     }
 
     /**
-     * The minimax algorithm with alpha-beta pruning (https://en.wikipedia.org/wiki/Minimax).
+     * A wrapper for the minimax algorithm to find the optimal move for the current board state.
+     * @param maxDepth - The maximum depth to search.
+     * @returns The optimal move for the current board state.
+     */
+    protected search(maxDepth: number): { move: Position; score: number; } {
+        let best: { move: Position; score: number; } = {
+            move: { x: NaN, y: NaN },
+            score: -Infinity,
+        };
+
+        for (let depth = 1; depth <= maxDepth; depth++)
+            best = this.minimax(depth, -Infinity, Infinity, this.currentPlayerId);
+
+        return best;
+    }
+
+    /**
+     * The minimax (negamax) algorithm with alpha-beta pruning (https://en.wikipedia.org/wiki/Minimax).
      * @param depth - The depth of the algorithm.
      * @param alpha - The bounds for the alpha-beta variation of the algorithm.
      * @param beta - The bounds for the alpha-beta variation of the algorithm.
-     * @param maximisingPlayer - Whether or not the current player is the maximising player.
+     * @param playerId - The player to calculate the move for.
      * @returns The optimal move.
      */
-    protected alphabeta(
-        depth: number = Infinity,
-        alpha: number = -Infinity,
-        beta: number = Infinity,
-        maximisingPlayer: boolean = true,
-    ): { move: Position; score: number; } {
-        const playerIds = [(this.currentPlayerId + 1) % 2, this.currentPlayerId];
+    // eslint-disable-next-line max-statements
+    private minimax(depth: number, alpha: number, beta: number, playerId: number): { move: Position; score: number; } {
+        const { board } = this;
+        const { hash } = board;
 
-        if (depth === 0 || this.board.winner !== false) {
+        const cached = this.transposition.get(hash);
+
+        if (cached && cached.depth >= depth) {
             return {
-                move: { x: NaN, y: NaN },
-                score: this.board.heuristic * (this.currentPlayerId === 0 ? 1 : -1),
+                move: this.bestMoves.get(hash) ?? { x: NaN, y: NaN },
+                score: cached.score,
             };
         }
 
-        if (this.cache.has(this.board.toString()))
-            return this.cache.get(this.board.toString())!;
+        if (depth === 0 || board.winner !== false) {
+            const score = board.heuristic * (this.currentPlayerId === 0 ? 1 : -1);
 
-        let bestMove = {
-            move: { x: NaN, y: NaN },
-            score: maximisingPlayer ? -Infinity : Infinity,
-        };
-        const { emptyCells } = this.board;
+            this.transposition.set(hash, { depth, score });
 
-        for (const move of emptyCells) {
-            this.board.makeMove(move, playerIds[Number(maximisingPlayer)]!);
-            const { score } = this.alphabeta(depth - 1, alpha, beta, !maximisingPlayer);
-
-            this.board.undoLastMove();
-
-            if (maximisingPlayer) {
-                const bestScore = Math.max(score, bestMove.score);
-
-                if (bestScore !== bestMove.score)
-                    bestMove = { move, score };
-
-                if (bestMove.score > beta)
-                    break;
-
-                // eslint-disable-next-line no-param-reassign
-                alpha = Math.max(alpha, bestScore);
-            } else {
-                const bestScore = Math.min(score, bestMove.score);
-
-                if (bestScore !== bestMove.score)
-                    bestMove = { move, score };
-
-                if (bestMove.score < alpha)
-                    break;
-
-                // eslint-disable-next-line no-param-reassign
-                beta = Math.min(beta, bestScore);
-            }
+            return {
+                move: { x: NaN, y: NaN },
+                score,
+            };
         }
 
-        this.cache.set(this.board.toString(), bestMove);
+        const moves = [...board.emptyCells];
 
-        return bestMove;
+        // Move ordering: try previously best move first
+        const bestStored = this.bestMoves.get(hash);
+
+        if (bestStored) {
+            const index = moves.findIndex((m) => m.x === bestStored.x && m.y === bestStored.y);
+
+            if (index > 0)
+                moves.unshift(moves.splice(index, 1)[0]!);
+        }
+
+        let bestScore = -Infinity;
+        let bestMove: Position | null = null;
+
+        // eslint-disable-next-line @typescript-eslint/prefer-for-of
+        for (let i = 0; i < moves.length; i++) {
+            const move = moves[i]!;
+
+            board.makeMove(move, playerId);
+
+            const { score } = this.minimax(
+                depth - 1,
+                -beta,
+                -alpha,
+                playerId ^ 1,
+            );
+
+            const value = -score;
+
+            board.undoLastMove();
+
+            if (value > bestScore) {
+                bestScore = value;
+                bestMove = move;
+            }
+
+            if (value > alpha)
+                // eslint-disable-next-line no-param-reassign
+                alpha = value;
+
+            if (alpha >= beta)
+                break;
+        }
+
+        if (bestMove) {
+            this.transposition.set(hash, { depth, score: bestScore });
+            this.bestMoves.set(hash, bestMove);
+        }
+
+        return {
+            move: bestMove ?? { x: NaN, y: NaN },
+            score: bestScore,
+        };
     }
 
     /** Changes which player's turn it is. */
